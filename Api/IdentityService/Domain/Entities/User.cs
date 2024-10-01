@@ -1,16 +1,16 @@
-﻿using Medo;
+﻿using System.Transactions;
+using Core.BasicRoles;
+using Domain.Interfaces;
+using Medo;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities
 {
     public class User : IdentityUser<Guid>
     {
-        public async Task<IdentityResult> CreateAsync(UserManager<User> userManager, string password)
+        public async Task<IdentityResult> CreateAsync(IUserStore userManager, string password, string userRole)
         {
-            Id = new Uuid7().ToGuid();
-
-            var createResult = await userManager.CreateAsync(this, password);
-
+            var createResult = userManager.
             return createResult;
         }
     }
