@@ -1,5 +1,4 @@
-﻿using Core.BasicRoles;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.IdentityModel.Tokens.Jwt;
 
@@ -11,5 +10,5 @@ public interface IUserStore
     Task<List<User>> GetByPageAsync(int page);
     Task<User?> CheckExistAsync(Guid id);
     Task<JwtSecurityToken?> LoginAsync(User userLogin, string password);
-    Task<(User? user, UserRole role)> GetInfoAsync(Guid userId);
+    Task<User> GetInfoAsync(Guid userId);
 }

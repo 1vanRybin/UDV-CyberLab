@@ -9,7 +9,7 @@ namespace Services.Interfaces
     {
         Task<IdentityResult> RegisterUserAsync(User user, string Password, UserRole role);
         Task<JwtSecurityToken?> LoginUserAsync(User userLogin, string password);
-        Task<(User? user, UserRole role)> GetUserInfoAsync(Guid userId);
+        Task<User> GetUserInfoAsync(Guid userId);
         Task<List<User>> GetUsersAsync(int page);
     }
 }

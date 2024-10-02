@@ -1,5 +1,4 @@
-﻿using Core.BasicRoles;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Services.Interfaces;

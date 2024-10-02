@@ -24,16 +24,16 @@ public class UserController : ControllerBase
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var result = await _userService.GetUserInfoAsync(userId);
-        if (result.user is null)
+        if (result is null)
         {
             return NotFound("User Not Found");
         }
         
         return Ok(new UserInfoResponse
         {
-            UserName = result.user.UserName,
-            Email = result.user.Email,
-            Role = result.role
+            UserName = result.UserName,
+            Email = result.Email,
+            Role = result.Role
         });
     }
     

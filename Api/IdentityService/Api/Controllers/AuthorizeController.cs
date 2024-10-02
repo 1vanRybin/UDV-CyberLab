@@ -12,9 +12,8 @@ namespace Api.Controllers;
 [ApiController]
 public class AuthorizeController : ControllerBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IUserService _userService;
-    public AuthorizeController(IConfiguration configuration, IServiceProvider serviceProvider, 
+    public AuthorizeController(IServiceProvider serviceProvider, 
         IHttpContextAccessor httpContextAccessor)
     {
         var claimsIdentity = httpContextAccessor.HttpContext?.User.Identity as ClaimsIdentity;
@@ -22,9 +21,8 @@ public class AuthorizeController : ControllerBase
             .FirstOrDefault(c => c.Type == ClaimTypes.Role && c.Value == UserRole.ADMIN.ToString());
         var role = roleClaim?.Value ?? UserRole.USER.ToString(); 
         
-        _userService = serviceProvider.GetKeyedService<IUserService>(role) ?? 
+        _userService = serviceProvider.GetService<IUserService>() ?? 
                        throw new InvalidOperationException("User service not found for the specified role.");
-        _configuration = configuration;
     }
 
 

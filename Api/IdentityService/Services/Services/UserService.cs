@@ -29,7 +29,7 @@ namespace Services.Services
             return token;
         }
         
-        public async Task<(User? user, UserRole role)> GetUserInfoAsync(Guid userId)
+        public async Task<User> GetUserInfoAsync(Guid userId)
         {
             var user = await _userStore.GetInfoAsync(userId);
             
