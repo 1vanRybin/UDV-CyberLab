@@ -11,12 +11,12 @@ builder.Services.TryAddServices();
 builder.Services.TryAddInfrastucture(builder.Configuration);
 
 var app = builder.Build();
-
-//using (var scope = app.Services.CreateScope())
-//{
-//    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//    await context.Database.MigrateAsync();
-//}
+if (!app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await context.Database.MigrateAsync();
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();

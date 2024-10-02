@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Core.BasicRoles;
 using Domain.Entities;
 using IdentityServerApi.Controllers.User.Request;
-using Infrastucture.Data;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 

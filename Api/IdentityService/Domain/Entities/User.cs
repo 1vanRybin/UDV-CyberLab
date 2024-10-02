@@ -1,7 +1,4 @@
-﻿using System.Transactions;
-using Core.BasicRoles;
-using Domain.Interfaces;
-using Medo;
+﻿using Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities

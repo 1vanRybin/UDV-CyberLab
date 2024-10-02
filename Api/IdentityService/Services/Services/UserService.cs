@@ -1,12 +1,8 @@
-﻿using System.Data.Entity;
-using Core.BasicRoles;
+﻿using Core.BasicRoles;
 using Domain.Entities;
-using ExampleCore.AuthOptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Domain.Interfaces;
 
 namespace Services.Services

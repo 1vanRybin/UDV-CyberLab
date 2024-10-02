@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 public static class InfrastuctureStartUp
 {
@@ -27,7 +26,7 @@ public static class InfrastuctureStartUp
         serviceCollection.AddAuth();
 
         serviceCollection.AddScoped<IUserStore, UserRepository>();
-        serviceCollection.AddHostedService<RoleSeeder>();
+        RoleSeeder.SeedRolesAsync(serviceCollection.BuildServiceProvider());
 
         var connectionString = configurationManager.GetConnectionString("DefaultConnection");
        
