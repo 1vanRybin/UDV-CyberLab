@@ -10,9 +10,7 @@ public static class HttpServiceStartup
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-
-            // Добавление поддержки Bearer Token
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "NEOLabAPIaboba", Version = "v1" });
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Description = "JWT Authorization header using the Bearer scheme.",
