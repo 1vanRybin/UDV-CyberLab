@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
-namespace Infrastucture
+namespace Infrastucture;
+
+public class ApplicationDbContext: IdentityDbContext<User,IdentityRole<Guid>,Guid>
 {
-    public class ApplicationDbContext
-    {
-    }
+    public ApplicationDbContext(DbContextOptions options)
+        : base(options){}
 }

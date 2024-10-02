@@ -1,135 +1,51 @@
 ﻿using Core.BasicRoles;
 using Domain.Entities;
-using ExampleCore.AuthOptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using Domain.Interfaces;
 
 namespace Services.Services
 {
     public class UserService : IUserService
     {
-        private UserManager<User> _userManager;
-        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
+        private readonly IUserStore _userStore;
 
-
-        public UserService(UserManager<User> userManager,
-            RoleManager<IdentityRole<Guid>> roleManager)
+        public UserService(IUserStore userStore)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
+            _userStore = userStore;
         }
 
-        public async Task<IdentityResult> RegisterUserAsync(User user, string password)
+        public async Task<IdentityResult> RegisterUserAsync(User user, string password, UserRole role)
         {
-            var createResult = await user.CreateAsync(_userManager, password);
-
-            if (!createResult.Succeeded)
-            {
-                return createResult;
-            }
-
-            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
-            {
-                await _roleManager.CreateAsync(new IdentityRole<Guid>(UserRoles.User));
-            }
-
-            if (await _roleManager.RoleExistsAsync(UserRoles.User))
-            {
-                await _userManager.AddToRoleAsync(user, UserRoles.User);
-            }
-
+            var createResult = await user.CreateAsync(_userStore, password, role.ToString());
             return createResult;
-
         }
 
-        public async Task<JwtSecurityToken> LoginUserAsync(User userLogin, string password)
+        public async Task<JwtSecurityToken?> LoginUserAsync(User userLogin, string password)
         {
-            var user = await _userManager.FindByNameAsync(userLogin.UserName);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, password))
-            {
-                return null;
-            }
-
-            var userRoles = await _userManager.GetRolesAsync(user);
-
-            var claims = new List<Claim>()
-        {
-            new(ClaimTypes.Name, user.UserName),
-            new("id", user.Id.ToString()),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(nameof(IdentityUser.SecurityStamp), user.SecurityStamp)
-        };
-            claims.AddRange(userRoles.Select(userRole =>
-                new Claim(ClaimTypes.Role, userRole)));
-
-            var token = GetToken(claims);
+            var token = await _userStore.LoginAsync(userLogin, password);
+            
             return token;
         }
-
+        
         public async Task<User> GetUserInfoAsync(Guid userId)
         {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-
-            if (user is null)
-            {
-                throw new Exception("User Not Found");
-            }
-
+            var user = await _userStore.GetInfoAsync(userId);
+            
             return user;
+        }
+
+        public async Task<List<User>> GetUsersAsync(int page)
+        {
+            var paginatedUsers = await _userStore.GetByPageAsync(page);
+            return paginatedUsers;
         }
 
         public async Task<Guid> CheckExistAsync(Guid id)
         {
-            var user = await _userManager.FindByIdAsync(id.ToString());
-            if (user is null)
-            {
-                return Guid.Empty;
-            }
-
-            return user.Id;
-        }
-
-        public async Task<User> UpdateAsync(User user)
-        {
-
-            var userFind = await _userManager.FindByIdAsync(user.Id.ToString());
-
-            if (userFind is null)
-            {
-                return null;
-            }
-
-            userFind.UserName = user.UserName;
-            userFind.Email = user.Email;
-
-            var result = await _userManager.UpdateAsync(userFind);
-
-            if (!result.Succeeded)
-            {
-                throw new InvalidOperationException("Failed to update user");
-            }
-
-            return userFind;
-        }
-
-
-        private JwtSecurityToken GetToken(List<Claim> authClaims)
-        {
-            var authSigningKey = AuthOptions.GetSymmetricSecurityKey();
-
-            var token = new JwtSecurityToken(
-                issuer: AuthOptions.ISSUER,
-                audience: AuthOptions.AUDIENCE,
-                expires: DateTime.Now.AddHours(3),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-            );
-
-            return token;
-
+            var user = await _userStore.CheckExistAsync(id);
+            return user?.Id ?? Guid.Empty;
         }
     }
 }
