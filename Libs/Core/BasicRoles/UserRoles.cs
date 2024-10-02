@@ -8,8 +8,8 @@ namespace Core.BasicRoles
 {
     public enum UserRole
     {
-        User,
-        Admin,
-        Teacher
+        USER,
+        ADMIN,
+        TEACHER
     }
 }

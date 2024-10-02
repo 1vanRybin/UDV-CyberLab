@@ -1,8 +1,13 @@
 ﻿using System.Data.Entity;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Core.BasicRoles;
 using Domain.Entities;
 using Domain.Interfaces;
+using ExampleCore.AuthOptions;
 using Medo;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastucture.Data;
 
@@ -38,10 +43,46 @@ public class UserRepository: IUserStore
         }
 
         return createResult;
-
     }
-        
-    public async Task<List<User>> GetByPage(int page)
+
+    public async Task<JwtSecurityToken?> LoginAsync(User userLogin, string password)
+    {
+
+        var user = await _userManager.FindByEmailAsync(userLogin.Email);
+        if (user == null || !await _userManager.CheckPasswordAsync(user, password))
+        {
+            return null;
+        }
+
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var claims = CreateClaims(user, userRoles);
+        var token = CreateToken(claims);
+
+        return token;
+    }
+
+    public async Task<(User? user, UserRole role)> GetInfoAsync(Guid userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return (null, default);
+        }
+
+        var roleString = (await _userManager.GetRolesAsync(user)).
+            FirstOrDefault();
+
+        var userRole = UserRole.USER;
+        if (roleString != null && roleString != UserRole.USER.ToString() &&
+            Enum.TryParse<UserRole>(roleString, out var parsedRole))
+        {
+            userRole = parsedRole;
+        }
+
+        return (user, userRole);
+    }
+
+    public async Task<List<User>> GetByPageAsync(int page)
     {
         var userQuery = _userManager.Users;
             
@@ -57,5 +98,34 @@ public class UserRepository: IUserStore
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
         return user;
+    }
+
+    private static List<Claim> CreateClaims(User user, IList<string> userRoles)
+    {
+        var claims = new List<Claim>()
+            {
+                new(ClaimTypes.Email, user.Email),
+                new("id", user.Id.ToString()),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new(nameof(IdentityUser.SecurityStamp), user.SecurityStamp),
+            };
+        claims.AddRange(userRoles.Select(userRole =>
+            new Claim(ClaimTypes.Role, userRole)));
+        return claims;
+    }
+
+    private static JwtSecurityToken CreateToken(List<Claim> authClaims)
+    {
+        var authSigningKey = AuthOptions.GetSymmetricSecurityKey();
+
+        var token = new JwtSecurityToken(
+            issuer: AuthOptions.ISSUER,
+            audience: AuthOptions.AUDIENCE,
+            expires: DateTime.Now.AddHours(3),
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        );
+
+        return token;
     }
 }

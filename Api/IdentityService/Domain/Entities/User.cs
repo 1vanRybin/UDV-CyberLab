@@ -10,7 +10,7 @@ namespace Domain.Entities
     {
         public async Task<IdentityResult> CreateAsync(IUserStore userManager, string password, string userRole)
         {
-            var createResult = userManager.
+            var createResult = await userManager.CreateAsync(this, password, userRole);
             return createResult;
         }
     }

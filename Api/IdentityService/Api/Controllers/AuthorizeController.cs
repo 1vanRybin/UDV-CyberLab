@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Core.BasicRoles;
 using Domain.Entities;
 using IdentityServerApi.Controllers.User.Request;
+using Infrastucture.Data;
 using Microsoft.AspNetCore.Mvc;
 using Services.Interfaces;
 
@@ -14,13 +15,13 @@ public class AuthorizeController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly IUserService _userService;
-
-    public AuthorizeController(IConfiguration configuration, IServiceProvider serviceProvider, IHttpContextAccessor httpContextAccessor)
+    public AuthorizeController(IConfiguration configuration, IServiceProvider serviceProvider, 
+        IHttpContextAccessor httpContextAccessor)
     {
         var claimsIdentity = httpContextAccessor.HttpContext?.User.Identity as ClaimsIdentity;
         var roleClaim = claimsIdentity?.Claims
-            .FirstOrDefault(c => c.Type == ClaimTypes.Role && c.Value == UserRole.Admin.ToString());
-        var role = roleClaim?.Value ?? UserRole.User.ToString(); 
+            .FirstOrDefault(c => c.Type == ClaimTypes.Role && c.Value == UserRole.ADMIN.ToString());
+        var role = roleClaim?.Value ?? UserRole.USER.ToString(); 
         
         _userService = serviceProvider.GetKeyedService<IUserService>(role) ?? 
                        throw new InvalidOperationException("User service not found for the specified role.");
