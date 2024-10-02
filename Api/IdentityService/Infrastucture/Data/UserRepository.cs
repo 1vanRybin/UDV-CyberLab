@@ -41,7 +41,9 @@ public class UserRepository: IUserStore
             await transaction.RollbackAsync();
             return roleResult;
         }
-
+        
+        await transaction.CommitAsync();
+        
         return createResult;
     }
 
