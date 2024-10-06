@@ -26,7 +26,7 @@ public static class InfrastuctureStartUp
         serviceCollection.AddAuth();
 
         serviceCollection.AddScoped<IUserStore, UserRepository>();
-        RoleSeeder.SeedRolesAsync(serviceCollection.BuildServiceProvider());
+        serviceCollection.AddHostedService<RoleSeeder>();
 
         var connectionString = configurationManager.GetConnectionString("DefaultConnection");
        
