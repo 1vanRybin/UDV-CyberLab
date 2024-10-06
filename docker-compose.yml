@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  identity:
+    image: identity-udv
+    ports:
+      - "5215:5215"
+    depends_on:
+      - db
+    environment:
+      - ConnectionStrings__DefaultConnection=User ID=postgres;Password=123;Host=db;Port=5432;Database=identityNEOLab;Pooling=true;
+    
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: identityNEOLab
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
