@@ -1,9 +1,12 @@
 ﻿using System.Text.Json;
+using Api.Controllers.Question.Request;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Api.Controllers.Test.Request;
 using Api.Controllers.Test.Response;
+using Domain.Entities;
+using Service.interfaces;
 
 namespace WebApi.Controllers;
 
@@ -11,9 +14,9 @@ namespace WebApi.Controllers;
 [ApiController]
 public class TestsController : ControllerBase
 {
-    private readonly TestsService _testsService;
+    private readonly ITestService _testsService;
 
-    public TestsController(TestsService testsService)
+    public TestsController(ITestService testsService)
     {
         _testsService = testsService;
     }
@@ -21,65 +24,70 @@ public class TestsController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = "Admin,Teacher,User")]
-    public async Task<IActionResult<List<TestResponse>>> Get()//todo pagincia..
+    public async Task<IActionResult> GetTests()//todo pagincia..
     {
-        var tests = await _testsService.Get();
+        var tests = await _testsService.GetAsync();
         var res = new List<TestResponse>();
         foreach(var test in tests)
         {
-            res.Add(new TestResponse() {
-            Description = test.Description,
-            Name = test.Name,
-            Questions = test.Questions
+            res.Add(new TestResponse
+            {
+                Description = test.Description,
+                Name = test.Name,
+                Questions = test.Questions.Select(q => new CreateQuestionRequest
+                {
+                    Text = q.Text,
+                    Description = q.Description,
+                    QuestionType = q.QuestionType,
+                    CorrectAnswer = q.CorrectAnswer,
+                    QuestionData = q.QuestionData
+                }).ToList()
             });
         }
-        return res;
+        
+        return Ok(res);
     }
-
-    [HttpGet("{id}")]
+    
+    [HttpGet("{id:guid}")]
     [Authorize(Roles = "Admin,Teacher,User")]
-    public async Task<ActionResult<Test>> GetById(string id)
+    public async Task<IActionResult> GetById(Guid id)
     {
-        var result = await _testsService.GetById(id).ConfigureAwait(false);
-        return result.ToActionResult();
+        var test = await _testsService.GetByIdAsync(id);
+        return Ok(test);
     }
 
     [HttpPost]
     [Authorize(Roles = "Admin,Teacher")]
-    public async Task<ActionResult<string>> Post(CreateTestRequest request)
+    public async Task<IActionResult> Create(CreateTestRequest request)
     {
         var test = new Test
         {
             Description = request.Description,
             Name = request.Name,
-            Questions = new List<string>()
-        };
-
-        foreach (var question in request.Questions)
-        {
-            var newQuestion = new Question
+            Questions = request.Questions.Select(q => new Question()
             {
-                Description = question.Description,
-                Text = question.Text,
-                QuestionData = JsonSerializer.Serialize(question.QuestionData),
-                CorrectAnswer = question.CorrectAnswer,
-                QuestionType = question.QuestionType
-            };
-            var questionIdResult = await _questionsService.Create(newQuestion).ConfigureAwait(false);
-            if (!questionIdResult.IsSuccess)
-                return questionIdResult.ToActionResult();
-            test.Questions.Add(questionIdResult.Result);
-        }
+                Text = q.Text,
+                Description = q.Description,
+                QuestionType = q.QuestionType,
+                CorrectAnswer = q.CorrectAnswer,
+                QuestionData = q.QuestionData
+            }).ToList()
+        };
+        var guid = await _testsService.CreateAsync(test);
 
-        var testId = await _testsService.Create(test).ConfigureAwait(false);
-        return testId.ToActionResult();
+        return CreatedAtAction(nameof(GetById), new { id = guid }, test);
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:guid}")]
     [Authorize(Roles = "Admin,Teacher")]
-    public async Task<IActionResult> Delete(string id)
+    public async Task<IActionResult> Delete(Guid id)
     {
-        var result = await _testsService.Delete(id).ConfigureAwait(false);
-        return result.ToActionResult();
+        var deletedTest = await _testsService.DeleteAsync(id);
+        if (deletedTest is null)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
     }
 }

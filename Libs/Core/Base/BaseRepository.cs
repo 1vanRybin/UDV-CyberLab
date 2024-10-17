@@ -13,16 +13,11 @@ public class BaseRepository: IStandartStore
         _applicationDbContext = applicationDbContext;
     }
 
-    public async Task<T> GetByIdAsync<T>(Guid id)
+    public async Task<T?> GetByIdAsync<T>(Guid id)
         where T : BaseEntity<Guid>
     {
         var res = await _applicationDbContext.Set<T>().FindAsync(id);
-
-        if (res is null)
-        {
-            throw new Exception("Data not found");
-        }
-
+        
         return res;
     }
 
@@ -57,12 +52,14 @@ public class BaseRepository: IStandartStore
     }
     
 
-    public async Task DeleteAsync<T>(T entity)
+    public async Task<bool> DeleteAsync<T>(T entity)
         where T : BaseEntity<Guid>
     {
         _applicationDbContext.Set<T>().Remove(entity);
 
-        await _applicationDbContext.SaveChangesAsync();
+        var affectedRows  = await _applicationDbContext.SaveChangesAsync();
+
+        return affectedRows > 0;
     }
 
     public async Task<List<T>> GetAllAsync<T>()
@@ -71,5 +68,16 @@ public class BaseRepository: IStandartStore
         var res = await _applicationDbContext.Set<T>().ToListAsync();
 
         return res;
+    }
+    
+    public async Task<List<T>> GetPaginatedAsync<T>(int page, int pageSize)
+        where T : BaseEntity<Guid>
+    {
+        var paginatedList = await _applicationDbContext.Set<T>()
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        
+        return paginatedList;
     }
 }

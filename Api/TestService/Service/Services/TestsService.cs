@@ -1,38 +1,47 @@
 using Domain.Entities;
-using Infrastucture.Data;
+using Domain.Interfaces;
+using Service.interfaces;
 
 namespace WebApi.Services;
 
-public class TestsService
+public class TestsService: ITestService
 {
-    private readonly BaseRepository _repository;
+    private readonly IStandartStore _repository;
 
-    public TestsService(BaseRepository repository)
+    public TestsService(IStandartStore repository)
     {
         _repository = repository;
     }
 
-    public async Task<IEnumerable<Test>> Get()
+    public async Task<IEnumerable<Test>> GetAsync()
     {
+        // todo ждем когда фронт скажет про погинацию и поменять на  _repository.GetPaginatedAsync<T>(int page, int pageSize)
         var res = await _repository.GetAllAsync<Test>();
         return res;
     }
 
-    public async Task<Test> GetById(Guid id)
+    public async Task<Test?> GetByIdAsync(Guid id)
     {
         var res = await _repository.GetByIdAsync<Test>(id);
         return res;
     }
 
-    public async Task<Guid> Create(Test test)
+    public async Task<Guid> CreateAsync(Test test)
     {
         var id = await _repository.CreateAsync(test);
         return id;
     }
     
-    public async Task Delete(Guid id)
+    public async Task<Test?> DeleteAsync(Guid id)
     {
         var test = await _repository.GetByIdAsync<Test>(id);
-        await _repository.DeleteAsync(test);
+        if (test is null) 
+        {
+            return null;
+        }
+        
+        var deleteResult = await _repository.DeleteAsync(test);
+
+        return deleteResult ? test : null;
     }
 }
