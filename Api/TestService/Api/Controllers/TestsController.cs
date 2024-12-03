@@ -1,10 +1,5 @@
-﻿using System.Text.Json;
-using Api.Controllers.Question.Request;
-using Microsoft.AspNetCore.Mvc;
-using WebApi.Services;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Api.Controllers.Test.Request;
-using Api.Controllers.Test.Response;
 using Domain.Entities;
 using Service.interfaces;
 
@@ -30,19 +25,7 @@ public class TestsController : ControllerBase
         var res = new List<TestResponse>();
         foreach(var test in tests)
         {
-            res.Add(new TestResponse
-            {
-                Description = test.Description,
-                Name = test.Name,
-                Questions = test.Questions.Select(q => new CreateQuestionRequest
-                {
-                    Text = q.Text,
-                    Description = q.Description,
-                    QuestionType = q.QuestionType,
-                    CorrectAnswer = q.CorrectAnswer,
-                    QuestionData = q.QuestionData
-                }).ToList()
-            });
+            
         }
         
         return Ok(res);
@@ -64,7 +47,7 @@ public class TestsController : ControllerBase
         {
             Description = request.Description,
             Name = request.Name,
-            Questions = request.Questions.Select(q => new Question()
+            Questions = request.Questions.Select(q => new QuestionBase()
             {
                 Text = q.Text,
                 Description = q.Description,
