@@ -11,4 +11,8 @@ public interface ITestService
     public Task<Guid> CreateAsync(Test test);
 
     public Task<Test?> DeleteAsync(Guid id);
+    
+    public Task<Test> UpdateAsync(Test test);
+
+    public Task<ICollection<TestResult>?> GetUserTestResultsAsync(Guid userId);
 }

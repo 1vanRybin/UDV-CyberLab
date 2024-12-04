@@ -24,7 +24,14 @@ namespace Infrastructure
                 .WithMany(t => t.UserTests)
                 .HasForeignKey(ut => ut.TestId)
                 .OnDelete(DeleteBehavior.Cascade);
-
+            
+            modelBuilder.Entity<QuestionBase>()
+                .HasDiscriminator<string>("QuestionType")
+                .HasValue<QuestionCompliance>("Compliance")
+                .HasValue<QuestionFile>("File")
+                .HasValue<QuestionOpen>("Open")
+                .HasValue<QuestionVariant>("Variant");
+            
             base.OnModelCreating(modelBuilder);
         }
     }

@@ -7,9 +7,11 @@ namespace WebApi.Services;
 public class TestsService: ITestService
 {
     private readonly IStandartStore _repository;
+    private readonly ITestStore _testStore;
 
-    public TestsService(IStandartStore repository)
+    public TestsService(IStandartStore repository, ITestStore testStore)
     {
+        _testStore = testStore;
         _repository = repository;
     }
 
@@ -43,5 +45,20 @@ public class TestsService: ITestService
         var deleteResult = await _repository.DeleteAsync(test);
 
         return deleteResult ? test : null;
+    }
+
+    public async Task<Test> UpdateAsync(Test test)
+    {
+        //todo подумать о том, что если тут вдруг ошибка будет.
+        var res = await _repository.UpdateAsync(test);
+
+        return res;
+    }
+
+    public async Task<ICollection<TestResult>?> GetUserTestResultsAsync(Guid userId)
+    {
+       var result = await _testStore.GetUserTestResultsAsync(userId);
+
+       return result;
     }
 }
