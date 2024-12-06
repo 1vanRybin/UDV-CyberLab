@@ -1,6 +1,8 @@
-﻿namespace Domain.Entities
+﻿using Domain.DTO.Questions;
+
+namespace Domain.Entities
 {
-    public record QuestionFileDto : QuestionBase
+    public record QuestionFileDto : QuestionBaseDto
     {
         public string InputFile { get; set; }
     }

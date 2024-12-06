@@ -1,8 +1,7 @@
-﻿namespace Domain.Entities
+﻿namespace Domain.DTO.Questions;
+
+public record QuestionVariantDto : QuestionBaseDto
 {
-    public record QuestionVariantDto : QuestionBase
-    {
-        public int[] Answers { get; set; }
-        public int[] CorrectAnswers { get; set; }
-    }
+    public int[] Answers { get; set; }
+    public int[] CorrectAnswers { get; set; }
 }

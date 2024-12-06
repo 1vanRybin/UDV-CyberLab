@@ -4,7 +4,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Service.interfaces;
 
-namespace WebApi.Services;
+namespace Service.Services;
 
 public class TestsService: ITestService
 {
@@ -22,14 +22,19 @@ public class TestsService: ITestService
     public async Task<IEnumerable<TestDto>> GetAsync()
     {
         // todo ждем когда фронт скажет про погинацию и поменять на  _repository.GetPaginatedAsync<T>(int page, int pageSize)
-        var testEntity = await _repository.GetAllAsync<Test>();
+        var testEntity = await _testStore.GetAllAsync();
 
         return _mapper.Map<IEnumerable<TestDto>>(testEntity);
     }
 
     public async Task<TestDto> GetByIdAsync(Guid id)
     {
-        var testEntity = await _repository.GetByIdAsync<Test>(id);
+        var testEntity = await _testStore.GetByIdAsync(id);
+        if (testEntity is null)
+        {
+            return null;
+        }
+        
         var testDto = _mapper.Map<TestDto>(testEntity);
 
         testDto.Questions = await GetAllQuestionsByTestIdAsync(id);

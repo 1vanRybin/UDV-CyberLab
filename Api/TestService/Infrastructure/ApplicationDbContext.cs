@@ -7,9 +7,10 @@ namespace Infrastructure
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
+            Database.EnsureCreated();
         }
 
-        public DbSet<Test> Tests { get; set; }
+        public DbSet<Test?> Tests { get; set; }
         public DbSet<QuestionBase> Questions { get; set; }  
         public DbSet<QuestionCompliance> QuestionCompliances { get; set; }
         public DbSet<QuestionFile> QuestionFiles { get; set; }

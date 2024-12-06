@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Service.AutoMapper;
 using Service.interfaces;
+using Service.Services;
 using WebApi.Services;
 
 public static class ServiceStartUp

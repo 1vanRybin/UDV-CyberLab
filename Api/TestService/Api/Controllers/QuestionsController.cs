@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
+using Domain.DTO.Questions;
 using Domain.Entities;
 using Domain.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.interfaces;
 
 namespace Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/Questions")]
 [Produces("application/json")]
@@ -24,8 +23,6 @@ public class QuestionsController : ControllerBase
 
 
     [HttpGet("{id:guid}", Name = nameof(GetQuestion))]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(QuestionComplianceDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(QuestionFileDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(QuestionOpenDto), StatusCodes.Status200OK)]
@@ -48,10 +45,14 @@ public class QuestionsController : ControllerBase
     {
         var question = _mapper.Map<QuestionCompliance>(questionDto);
         var questionId = await _questionService.CreateAsync(question);
-
-        return CreatedAtRoute(
-            nameof(CreateComplianceQuestion),
-            new { id = questionId },
+        if (questionId == Guid.Empty)
+        {
+            return NotFound("Test Was Not Found");
+        }
+        
+        
+        return Created(
+            $"/api/Questions/{questionId}",
             _mapper.Map<QuestionComplianceDto>(question));
     }
 
@@ -63,9 +64,8 @@ public class QuestionsController : ControllerBase
         var question = _mapper.Map<QuestionFile>(questionDto);
         var questionId = await _questionService.CreateAsync(question);
 
-        return CreatedAtRoute(
-            nameof(CreateFileQuestion),
-            new { id = questionId },
+        return Created(
+            $"/api/Questions/{questionId}",
             _mapper.Map<QuestionFileDto>(question));
     }
 
@@ -77,9 +77,8 @@ public class QuestionsController : ControllerBase
         var question = _mapper.Map<QuestionOpen>(questionDto);
         var questionId = await _questionService.CreateAsync(question);
 
-        return CreatedAtRoute(
-            nameof(CreateOpenQuestion),
-            new { id = questionId },
+        return Created(
+            $"/api/Questions/{questionId}",
             _mapper.Map<QuestionOpenDto>(question));
     }
 
@@ -91,15 +90,14 @@ public class QuestionsController : ControllerBase
         var question = _mapper.Map<QuestionVariant>(questionDto);
         var questionId = await _questionService.CreateAsync(question);
         
-        return CreatedAtRoute(
-            nameof(CreateVariantQuestion),
-            new { id = questionId },
+        
+        
+        return Created(
+            $"/api/Questions/{questionId}",
             _mapper.Map<QuestionVariantDto>(question));
     }
     
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> UpdateQuestion([FromRoute] Guid id, [FromBody] QuestionBase? questionDto)
     {
         if (questionDto is null || id != questionDto.Id)
@@ -118,8 +116,6 @@ public class QuestionsController : ControllerBase
     }
     
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteQuestion([FromRoute] Guid id)
     {
         var result = await _questionService.DeleteAsync(id);

@@ -1,20 +1,17 @@
-﻿using Domain.Interfaces;
+﻿namespace Domain.DTO;
 
-namespace Domain.DTO
+public class TestDto
 {
-    public class TestDto
-    {
-        public Guid Id { get; set; }
-        public required string Name { get; set; }
-        public string? Description { get; set; }
+    public Guid Id { get; set; }
+    public required string Name { get; set; }
+    public string? Description { get; set; }
 
-        public int? AttemptsCount { get; set; }
+    public int? AttemptsCount { get; set; }
 
-        public DateTime? StartTestTime { get; set; }
-        public DateTime? EndTestTime { get; set; }
+    public DateTime? StartTestTime { get; set; }
+    public DateTime? EndTestTime { get; set; }
 
-        public DateTime? PassTestTime { get; set; }
-
-        public ICollection<object>? Questions { get; set; }
-    }
+    public DateTime? PassTestTime { get; set; }
+        
+    public ICollection<object>? Questions { get; set; }
 }

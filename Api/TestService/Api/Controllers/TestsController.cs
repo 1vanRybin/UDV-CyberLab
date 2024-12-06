@@ -1,15 +1,11 @@
-﻿using System.Security.Claims;
-using AutoMapper;
-using Core.BasicRoles;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
 using Domain.Entities;
 using ExampleCore.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Service.interfaces;
 
-namespace WebApi.Controllers;
+namespace Api.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 [Produces("application/json")]
@@ -48,8 +44,6 @@ public class TestController : ControllerBase
     }
     
     [HttpPost]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(Test), StatusCodes.Status201Created)]
     public async Task<ActionResult<Test>> CreateTest(Test test)
     {
@@ -67,11 +61,9 @@ public class TestController : ControllerBase
     }
     
     [HttpPut("{id:guid}")]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateTest(Guid id, Test test)
+    public async Task<IActionResult> UpdateTest(Test test)
     {
         var updatedTest = await _testService.UpdateAsync(test);
         
@@ -82,8 +74,6 @@ public class TestController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteTest(Guid id)

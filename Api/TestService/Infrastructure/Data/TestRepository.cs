@@ -12,7 +12,16 @@ public class TestRepository : ITestStore
     {
         _context = context;
     }
-    
+
+    public async Task<Test?> GetByIdAsync(Guid testId)
+    {
+        var testDbSet = _context.Tests;
+        
+        return await testDbSet
+            .Include(t => t.Questions)
+            .FirstOrDefaultAsync(t => t.Id == testId);
+    }
+
     public async Task<ICollection<UserTest>> GetUserTestResultsAsync(Guid userId)
     {
         var userTestDbSet = _context.UserTests;
@@ -31,5 +40,11 @@ public class TestRepository : ITestStore
             .Where(t => t.Id == testId)
             .SelectMany(t => t.Questions)
             .ToListAsync();
+    }
+
+    public async Task<List<Test?>> GetAllAsync()
+    {
+        return await _context.Tests
+            .Include(t => t.Questions).ToListAsync();
     }
 }

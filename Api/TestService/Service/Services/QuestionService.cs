@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using Domain.Entities;
+﻿using Domain.Entities;
 using Domain.Interfaces;
 using ExampleCore.Dal.Base;
 using Service.interfaces;
@@ -33,6 +32,12 @@ public class QuestionService : IQuestionService
 
     public async Task<Guid> CreateAsync<T>(T question) where T : BaseEntity<Guid>, IQuestionBase
     {
+        var test =  await _repository.GetByIdAsync<Test>(question.TestId);
+        if (test is null)
+        {
+            return Guid.Empty;
+        }
+        
         var result = await _repository.CreateAsync(question);
         
         return result;

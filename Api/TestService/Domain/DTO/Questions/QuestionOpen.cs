@@ -1,7 +1,6 @@
-﻿namespace Domain.Entities
+﻿namespace Domain.DTO.Questions;
+
+public record QuestionOpenDto : QuestionBaseDto
 {
-    public record QuestionOpenDto : QuestionBase
-    {
-        public string Answer { get; set; }
-    }
+    public string Answer { get; set; }
 }
