@@ -1,93 +1,103 @@
-﻿using System.Text.Json;
-using Api.Controllers.Question.Request;
-using Microsoft.AspNetCore.Mvc;
-using WebApi.Services;
-using Microsoft.AspNetCore.Authorization;
-using Api.Controllers.Test.Request;
-using Api.Controllers.Test.Response;
+﻿using AutoMapper;
 using Domain.Entities;
+using ExampleCore.Helpers;
+using Microsoft.AspNetCore.Mvc;
 using Service.interfaces;
 
-namespace WebApi.Controllers;
+namespace Api.Controllers;
 
-[Route("/api/[controller]")]
 [ApiController]
-public class TestsController : ControllerBase
+[Route("api/[controller]")]
+[Produces("application/json")]
+public class TestController : ControllerBase
 {
-    private readonly ITestService _testsService;
+    private readonly ITestService _testService;
+    private readonly IMapper _mapper;
 
-    public TestsController(ITestService testsService)
+    public TestController(ITestService testService, IMapper mapper)
     {
-        _testsService = testsService;
+        _testService = testService;
+        _mapper = mapper;
     }
-
-
+    
     [HttpGet]
-    [Authorize(Roles = "Admin,Teacher,User")]
-    public async Task<IActionResult> GetTests()//todo pagincia..
+    [ProducesResponseType(typeof(IEnumerable<Test>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<Test>>> GetTests()
     {
-        var tests = await _testsService.GetAsync();
-        var res = new List<TestResponse>();
-        foreach(var test in tests)
-        {
-            res.Add(new TestResponse
-            {
-                Description = test.Description,
-                Name = test.Name,
-                Questions = test.Questions.Select(q => new CreateQuestionRequest
-                {
-                    Text = q.Text,
-                    Description = q.Description,
-                    QuestionType = q.QuestionType,
-                    CorrectAnswer = q.CorrectAnswer,
-                    QuestionData = q.QuestionData
-                }).ToList()
-            });
-        }
-        
-        return Ok(res);
+        var tests = await _testService.GetAsync();
+        return Ok(tests);
     }
     
     [HttpGet("{id:guid}")]
-    [Authorize(Roles = "Admin,Teacher,User")]
-    public async Task<IActionResult> GetById(Guid id)
+    [ProducesResponseType(typeof(Test), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Test>> GetTest(Guid id)
     {
-        var test = await _testsService.GetByIdAsync(id);
-        return Ok(test);
-    }
-
-    [HttpPost]
-    [Authorize(Roles = "Admin,Teacher")]
-    public async Task<IActionResult> Create(CreateTestRequest request)
-    {
-        var test = new Test
-        {
-            Description = request.Description,
-            Name = request.Name,
-            Questions = request.Questions.Select(q => new Question()
-            {
-                Text = q.Text,
-                Description = q.Description,
-                QuestionType = q.QuestionType,
-                CorrectAnswer = q.CorrectAnswer,
-                QuestionData = q.QuestionData
-            }).ToList()
-        };
-        var guid = await _testsService.CreateAsync(test);
-
-        return CreatedAtAction(nameof(GetById), new { id = guid }, test);
-    }
-
-    [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "Admin,Teacher")]
-    public async Task<IActionResult> Delete(Guid id)
-    {
-        var deletedTest = await _testsService.DeleteAsync(id);
-        if (deletedTest is null)
+        var test = await _testService.GetByIdAsync(id);
+        
+        if (test == null)
         {
             return NotFound();
         }
 
+        return Ok(test);
+    }
+    
+    [HttpPost]
+    [ProducesResponseType(typeof(Test), StatusCodes.Status201Created)]
+    public async Task<ActionResult<Test>> CreateTest(Test test)
+    {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        var createdTest = await _testService.CreateAsync(test);
+
+        return CreatedAtAction(
+            nameof(GetTest),
+            new { id = createdTest },
+            createdTest);
+    }
+    
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateTest(Test test)
+    {
+        var updatedTest = await _testService.UpdateAsync(test);
+        
+        return CreatedAtAction(
+            nameof(UpdateTest),
+            new { id = updatedTest.Id },
+            updatedTest);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteTest(Guid id)
+    {
+        var deletedTest = await _testService.DeleteAsync(id);
+        if (deletedTest is null)
+        {
+            return NotFound();
+        }
+        
         return NoContent();
+    }
+    
+    [HttpGet("user/results")]
+    public async Task<ActionResult<ICollection<UserTest>>> GetUserTestResults()
+    {
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var results = await _testService.GetUserTestResultsAsync(userId);
+        
+        if (results is null)
+        {
+            return NotFound();
+        }
+        
+        return Ok(results);
     }
 }

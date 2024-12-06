@@ -1,14 +1,20 @@
-﻿using Domain.Entities;
+﻿using Domain.DTO;
+using Domain.Entities;
 
 namespace Service.interfaces;
 
 public interface ITestService
 {
-    public Task<IEnumerable<Test>> GetAsync();
+    Task<IEnumerable<TestDto>> GetAsync();
 
-    public Task<Test?> GetByIdAsync(Guid id);
+    Task<TestDto> GetByIdAsync(Guid id);
 
-    public Task<Guid> CreateAsync(Test test);
+    Task<Guid> CreateAsync(Test test);
 
-    public Task<Test?> DeleteAsync(Guid id);
+    Task<TestDto?> DeleteAsync(Guid id);
+
+    Task<TestDto> UpdateAsync(Test test);
+
+    Task<ICollection<UserTestResultDto>?> GetUserTestResultsAsync(Guid userId);
+    Task<ICollection<object>> GetAllQuestionsByTestIdAsync(Guid testId);
 }
