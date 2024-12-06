@@ -4,5 +4,5 @@ namespace Service.interfaces;
 
 public interface IQuestionStore
 {
-    Task<QuestionBase> GetByIdAsync(Guid id);
+    Task<QuestionBase?> GetByIdAsync(Guid id);
 }

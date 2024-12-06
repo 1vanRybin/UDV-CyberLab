@@ -6,13 +6,20 @@ using Service.interfaces;
 
 namespace WebApi.Services;
 
-public class QuestionService: IQuestionService
+public class QuestionService : IQuestionService
 {
     private readonly IStandartStore _repository;
-    
-    public async Task<QuestionBase?> GetByIdAsync(Guid questionId)
+    private readonly IQuestionStore _questionRepository;
+
+    public QuestionService(IStandartStore repository, IQuestionStore questionRepository)
     {
-        var question = await _repository.GetByIdAsync<QuestionBase>(questionId);
+        _repository = repository;
+        _questionRepository = questionRepository;
+    }
+    
+    public async Task<IQuestionBase> GetByIdAsync(Guid questionId)
+    {
+        var question = await _questionRepository.GetByIdAsync(questionId);
         
         return question switch
         {
@@ -22,11 +29,6 @@ public class QuestionService: IQuestionService
             QuestionVariant variant => variant,
             _ => null
         };
-    }
-
-    public Task<IReadOnlyList<IQuestionBase>> GetByTestIdAsync(Guid testId)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<Guid> CreateAsync<T>(T question) where T : BaseEntity<Guid>, IQuestionBase

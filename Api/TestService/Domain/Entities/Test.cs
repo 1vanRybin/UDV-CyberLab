@@ -1,21 +1,19 @@
-﻿using Domain.Interfaces;
+﻿using Domain.Entities;
 using ExampleCore.Dal.Base;
 
-namespace Domain.Entities
+public record Test : BaseEntity<Guid>
 {
-    public record Test : BaseEntity<Guid>
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
+    public string Name { get; set; }
+    public string Theme { get; set; }
+    public string Description { get; set; }
 
-        public int AttemptsCount { get; set; }
+    public int AttemptsCount { get; set; }
+    public DateTime StartTestTime { get; set; }
+    public DateTime EndTestTime { get; set; }
+    public DateTime PassTestTime { get; set; }
 
-        public DateTime StartTestTime { get; set; }
-        public DateTime EndTestTime { get; set; }
+    public int QuestionsCount { get => Questions.Count; }
+    public virtual ICollection<QuestionBase> Questions { get; set; }
 
-        public DateTime PassTestTime { get; set; }
-
-        public List<IQuestionBase> Questions { get; set; }
-        public virtual ICollection<UserTest> UserTests { get; set; }
-    }
+    public virtual ICollection<UserTest> UserTests { get; set; }
 }

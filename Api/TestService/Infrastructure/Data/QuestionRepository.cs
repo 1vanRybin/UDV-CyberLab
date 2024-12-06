@@ -1,9 +1,10 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Service.interfaces;
 
 namespace Infrastructure.Data;
 
-public class QuestionRepository
+public class QuestionRepository : IQuestionStore
 {
     private readonly ApplicationDbContext _context;
     
@@ -11,22 +12,12 @@ public class QuestionRepository
     {
         _context = context;
     }
-    
-    public async Task<IReadOnlyList<QuestionBase>> GetByTestIdAsync(Guid testId)
-    {
-        var questionsContext = _context.Questions;
-        
-        var questions = await _context.Questions
-            .Where(q => q.Id == testId)  // Используем TestId вместо Id для фильтрации по тесту
-            .Select(q => new 
-            {
-                QuestionCompliance = q as QuestionCompliance,
-                QuestionFile = q as QuestionFile,
-                QuestionOpen = q as QuestionOpen,
-                QuestionVariant = q as QuestionVariant
-            })
-            .ToListAsync();
 
-        return null;
+    public async Task<QuestionBase?> GetByIdAsync(Guid id)
+    {
+        var question = await _context.Set<QuestionBase>()
+            .FirstOrDefaultAsync(q => q.Id == id);
+
+        return question;
     }
 }

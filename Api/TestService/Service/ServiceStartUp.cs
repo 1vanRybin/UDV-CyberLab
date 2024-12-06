@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Service.AutoMapper;
 using Service.interfaces;
 using WebApi.Services;
@@ -9,6 +8,7 @@ public static class ServiceStartUp
     public static IServiceCollection TryAddServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<ITestService, TestsService>();
+        serviceCollection.AddScoped<IQuestionService, QuestionService>();
         AddAutoMapper(serviceCollection);
         return serviceCollection;
     }

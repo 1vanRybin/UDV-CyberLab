@@ -15,6 +15,6 @@ namespace Domain.DTO
 
         public DateTime? PassTestTime { get; set; }
 
-        public List<IQuestionBase>? Questions { get; set; }
+        public ICollection<object>? Questions { get; set; }
     }
 }

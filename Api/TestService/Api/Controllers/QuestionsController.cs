@@ -41,15 +41,6 @@ public class QuestionsController : ControllerBase
         return Ok(question);
     }
     
-    [HttpGet("ByTest/{testId:guid}")]
-    [Authorize(Roles = "Teacher")]
-    [Authorize(Roles = "Admin")]
-    public  async Task<IActionResult> GetQuestionsByTestId([FromRoute] Guid testId)
-    {
-        var questions = await _questionService.GetByTestIdAsync(testId);
-        return Ok(questions);
-    }
-    
     [HttpPost("compliance")]
     [ProducesResponseType(typeof(QuestionComplianceDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

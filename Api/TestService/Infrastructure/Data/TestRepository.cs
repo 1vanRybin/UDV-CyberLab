@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;
 
-public class TestRepository: ITestStore
+public class TestRepository : ITestStore
 {
     private readonly ApplicationDbContext _context;
     
@@ -13,22 +13,23 @@ public class TestRepository: ITestStore
         _context = context;
     }
     
-    public async Task<ICollection<TestResult>?> GetUserTestResultsAsync(Guid userId)
+    public async Task<ICollection<UserTest>> GetUserTestResultsAsync(Guid userId)
     {
         var userTestDbSet = _context.UserTests;
 
         var result = await userTestDbSet
             .Where(ut => ut.UserId == userId)
-            .Select(ut => new TestResult()
-            {
-                TestId = ut.TestId,
-                TestName = ut.Test.Name,
-                StartTime = ut.Test.StartTestTime,
-                EndTime = ut.Test.EndTestTime,
-                Points = ut.Points,
-                IsChecked = ut.IsChecked
-            }).ToListAsync();
+            .ToListAsync();
 
         return result;
+    }
+
+    public async Task<ICollection<QuestionBase>> GetAllQuestionsByTestIdAsync(Guid testId)
+    {
+
+        return await _context.Tests
+            .Where(t => t.Id == testId)
+            .SelectMany(t => t.Questions)
+            .ToListAsync();
     }
 }

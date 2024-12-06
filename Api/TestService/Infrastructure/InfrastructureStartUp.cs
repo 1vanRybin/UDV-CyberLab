@@ -6,6 +6,7 @@ using Domain.Interfaces;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Service.interfaces;
 
 public static class InfrastuctureStartUp
 {
@@ -13,7 +14,8 @@ public static class InfrastuctureStartUp
     {
         serviceCollection.TryAddScoped<IStandartStore, BaseRepository>();
         serviceCollection.TryAddScoped<ITestStore, TestRepository>();
-        
+        serviceCollection.TryAddScoped<IQuestionStore, QuestionRepository>();
+
         var connectionString = configurationManager.GetConnectionString("DefaultConnection");
 
         serviceCollection.AddDbContext<ApplicationDbContext>(options =>

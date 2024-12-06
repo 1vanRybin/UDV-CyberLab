@@ -9,7 +9,7 @@ namespace Service.AutoMapper
         public TestProfile()
         {
             CreateMap<Test, TestDto>().ReverseMap();
-            CreateMap<TestResult, UserTestResultDto>().ReverseMap();
+            CreateMap<UserTest, UserTestResultDto>().ReverseMap();
         }
     }
 }

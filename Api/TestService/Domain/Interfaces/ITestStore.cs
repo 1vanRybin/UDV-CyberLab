@@ -4,5 +4,7 @@ namespace Domain.Interfaces;
 
 public interface ITestStore
 {
-    Task<ICollection<TestResult>?> GetUserTestResultsAsync(Guid guid);
+    Task<ICollection<UserTest>> GetUserTestResultsAsync(Guid guid);
+
+    Task<ICollection<QuestionBase>> GetAllQuestionsByTestIdAsync(Guid testId);
 }
