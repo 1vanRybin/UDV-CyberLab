@@ -2,16 +2,35 @@ version: '3.4'
 
 services:
   identity:
-    image: identity-udv
+    build:
+      context: .
+      dockerfile: Api/IdentityService/Api/Dockerfile
     ports:
       - "5215:5215"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - ConnectionStrings__DefaultConnection=User ID=postgres;Password=123;Host=db;Port=5432;Database=identityNEOLab;Pooling=true;
     networks:
       - database
-    
+    restart: always
+
+  tests:
+    build:
+      context: .
+      dockerfile: Api/TestService/Api/Dockerfile
+    ports:
+      - "5068:5068"
+    depends_on:
+      tests-db:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=User ID=postgres;Password=123;Host=tests-db;Port=5432;Database=testsNEOLab;Pooling=true;
+    networks:
+      - database
+    restart: always
+
   db:
     image: postgres:latest
     environment:
@@ -20,6 +39,25 @@ services:
       POSTGRES_DB: identityNEOLab
     networks:
       - database
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  tests-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: testsNEOLab
+    networks:
+      - database
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "user" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
