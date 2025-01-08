@@ -10,6 +10,8 @@ namespace Domain.DTO.Answers
         /// Идентификатор вопроса (QuestionOpen).
         /// </summary>
         public Guid QuestionId { get; set; }
+        
+        public Guid UserAnswerId { get; set; }
 
         /// <summary>
         /// Текст ответа пользователя.

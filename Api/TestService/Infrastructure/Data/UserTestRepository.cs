@@ -18,16 +18,24 @@ namespace Infrastructure.Data
                 .FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TestId == testId);
         }
 
-        public async Task CreateAsync(UserTest userTest)
+        public async Task CreateAsync(UserTest? userTest)
         {
             await _context.UserTests.AddAsync(userTest);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateAsync(UserTest userTest)
+        public async Task UpdateAsync(UserTest? userTest)
         {
             _context.UserTests.Update(userTest);
             await _context.SaveChangesAsync();
+        }
+        
+        public async Task<UserTest?> GetLatestByUserAndTestAsync(Guid userId, Guid testId)
+        {
+            return await _context.UserTests
+                .Where(ut => ut.UserId == userId && ut.TestId == testId)
+                .OrderByDescending(ut => ut.AttemptNumber)
+                .FirstOrDefaultAsync();
         }
     }
 }

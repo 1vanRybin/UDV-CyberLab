@@ -10,6 +10,8 @@ namespace Domain.DTO.Answers
         /// Идентификатор вопроса (QuestionVariant).
         /// </summary>
         public Guid QuestionId { get; set; }
+        
+        public Guid UserAnswerId { get; set; }
 
         /// <summary>
         /// Массив выбранных пользователем вариантов ответа.

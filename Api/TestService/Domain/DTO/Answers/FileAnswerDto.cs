@@ -10,7 +10,9 @@ namespace Domain.DTO.Answers
         /// Идентификатор вопроса (QuestionFile).
         /// </summary>
         public Guid QuestionId { get; set; }
-
+        
+        public Guid UserAnswerId { get; set; }
+        
         /// <summary>
         /// Содержимое файла или путь к файлу, в зависимости от того, как реализована загрузка.
         /// </summary>

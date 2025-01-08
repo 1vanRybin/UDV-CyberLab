@@ -5,7 +5,7 @@ namespace Domain.Interfaces
 {
     public interface IUserAnswerRepository
     {
-        Task CreateOrUpdateAsync(UserAnswer answer);
+        Task<Guid> CreateOrUpdateAsync(UserAnswer answer);
         Task<List<UserAnswer>> GetAllByUserTestIdAsync(Guid userTestId);
     }
 }

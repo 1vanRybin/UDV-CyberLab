@@ -8,7 +8,7 @@ namespace Domain.DTO
         /// Id записи в UserTest (указывает, что ответы относятся к конкретному прохождению теста).
         /// </summary>
         public Guid UserTestId { get; set; }
-
+        
         /// <summary>
         /// Список ответов для "QuestionOpen".
         /// </summary>

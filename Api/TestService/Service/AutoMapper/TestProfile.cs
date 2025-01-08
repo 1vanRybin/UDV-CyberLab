@@ -8,7 +8,11 @@ namespace Service.AutoMapper
     {
         public TestProfile()
         {
-            CreateMap<Test, TestDto>().ReverseMap();
+            CreateMap<Test, TestDto>()
+                .ForMember(dest => dest.Questions, opt => opt.Ignore()) // Исключаем Questions из маппинга
+                .ReverseMap()
+                .ForMember(dest => dest.Questions, opt => opt.Ignore());
+            
             CreateMap<UserTest, UserTestResultDto>().ReverseMap();
         }
     }

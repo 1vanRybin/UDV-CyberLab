@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.DTO;
 using Domain.Entities;
 using ExampleCore.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -44,15 +45,18 @@ public class TestController : ControllerBase
     }
     
     [HttpPost]
-    [ProducesResponseType(typeof(Test), StatusCodes.Status201Created)]
-    public async Task<ActionResult<Test>> CreateTest(Test test)
+    [ProducesResponseType(typeof(TestDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult> CreateTest(TestDto test)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var createdTest = await _testService.CreateAsync(test);
+        var ownerId = UserHelper.GetUserId(HttpContext.Request);
+        test.OwnerId = ownerId;
+        var domainTest = _mapper.Map<Test>(test);
+        var createdTest = await _testService.CreateAsync(domainTest);
 
         return CreatedAtAction(
             nameof(GetTest),

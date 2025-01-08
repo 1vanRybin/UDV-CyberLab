@@ -22,7 +22,7 @@ public class TestRepository : ITestStore
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
 
-    public async Task<ICollection<UserTest>> GetUserTestResultsAsync(Guid userId)
+    public async Task<ICollection<UserTest?>> GetUserTestResultsAsync(Guid userId)
     {
         var userTestDbSet = _context.UserTests;
 

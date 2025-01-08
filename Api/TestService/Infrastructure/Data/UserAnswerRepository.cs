@@ -2,39 +2,40 @@
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Data
+namespace Infrastructure.Data;
+
+public class UserAnswerRepository : IUserAnswerRepository
 {
-    public class UserAnswerRepository : IUserAnswerRepository
+    private readonly ApplicationDbContext _context;
+
+    public UserAnswerRepository(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
+        _context = context;
+    }
 
-        public UserAnswerRepository(ApplicationDbContext context)
-        {
-            _context = context;
-        }
+    public async Task<List<UserAnswer>> GetAllByUserTestIdAsync(Guid userTestId)
+    {
+        return await _context.Set<UserAnswer>()
+            .Where(a => a.UserTestId == userTestId)
+            .ToListAsync();
+    }
 
-        public async Task<List<UserAnswer>> GetAllByUserTestIdAsync(Guid userTestId)
+    public async Task<Guid> CreateOrUpdateAsync(UserAnswer userAnswer)
+    {
+        if (userAnswer.Id != Guid.Empty)
         {
-            return await _context.Set<UserAnswer>()
-                .Where(a => a.UserTestId == userTestId)
-                .ToListAsync();
-        }
-
-        public async Task CreateOrUpdateAsync(UserAnswer answer)
-        {
-            var existing = await _context.Set<UserAnswer>().FindAsync(answer.Id);
-            if (existing == null)
+            var existingAnswer = await _context.UserAnswers.FindAsync(userAnswer.Id);
+            if (existingAnswer != null)
             {
-                await _context.Set<UserAnswer>().AddAsync(answer);
+                _context.Entry(existingAnswer).CurrentValues.SetValues(userAnswer);
+                await _context.SaveChangesAsync();
+                return existingAnswer.Id;
             }
-            else
-            {
-                existing.AnswerText = answer.AnswerText;
-                existing.VariantChoices = answer.VariantChoices;
-                existing.ComplianceData = answer.ComplianceData;
-                existing.FileContent = answer.FileContent;
-            }
-            await _context.SaveChangesAsync();
         }
+
+        userAnswer.Id = Guid.NewGuid();
+        _context.UserAnswers.Add(userAnswer);
+        await _context.SaveChangesAsync();
+        return userAnswer.Id;
     }
 }

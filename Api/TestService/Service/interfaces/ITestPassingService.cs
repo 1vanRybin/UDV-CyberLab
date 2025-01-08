@@ -6,7 +6,7 @@ namespace Service.interfaces
     {
         Task StartTestAsync(Guid testId, Guid userId);
         Task SaveAnswersAsync(Guid testId, Guid userId, UserAnswersDto userAnswersDto);
-        Task<float> FinishTestAsync(Guid testId, Guid userId);
+        Task<FinishedTestResultDto> FinishTestAsync(Guid testId, Guid userId);
         Task<UserAnswersDto> GetSavedAnswersAsync(Guid testId, Guid userId);
     }
 }

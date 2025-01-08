@@ -11,6 +11,7 @@ namespace Domain.DTO.Answers
         /// </summary>
         public Guid QuestionId { get; set; }
 
+        public Guid UserAnswerId { get; set; }
         /// <summary>
         /// Словарь, где ключ – это, например, элемент левой колонки, а значение – выбранный вариант соответствия справа.
         /// </summary>

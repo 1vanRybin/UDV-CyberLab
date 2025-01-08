@@ -34,14 +34,14 @@ namespace Api.Controllers
         public async Task<IActionResult> SaveAnswers(Guid testId, [FromBody] UserAnswersDto userAnswersDto)
         {
             await _testPassingService.SaveAnswersAsync(testId, UserHelper.GetUserId(HttpContext.Request), userAnswersDto);
-            return Ok("Ответы сохранены");
+            return Ok();
         }
 
         [HttpPost("{testId}/finish")]
         public async Task<IActionResult> FinishTest(Guid testId)
         {
-            float score = await _testPassingService.FinishTestAsync(testId, UserHelper.GetUserId(HttpContext.Request));
-            return Ok($"Тест завершён, итоговый результат: {score} баллов");
+            var score = await _testPassingService.FinishTestAsync(testId, UserHelper.GetUserId(HttpContext.Request));
+            return Ok(score);
         }
     }
 }
