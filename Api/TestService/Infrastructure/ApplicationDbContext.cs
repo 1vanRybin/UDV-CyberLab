@@ -17,6 +17,7 @@ namespace Infrastructure
         public DbSet<QuestionOpen> QuestionOpens { get; set; }
         public DbSet<QuestionVariant> QuestionVariants { get; set; }
         public DbSet<UserTest> UserTests { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
