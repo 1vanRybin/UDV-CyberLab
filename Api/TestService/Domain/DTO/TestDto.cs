@@ -15,7 +15,7 @@ public class TestDto
     public DateTime? EndTestTime { get; set; }
     public float MaxPoints { get; set; }
 
-    public DateTime? PassTestTime { get; set; }
+    public TimeSpan? PassTestTime { get; set; }
         
     public ICollection<object>? Questions { get; set; }
 }

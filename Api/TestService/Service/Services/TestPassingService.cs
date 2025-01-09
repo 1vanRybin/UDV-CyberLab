@@ -35,7 +35,10 @@ namespace Service.Services
                 {
                     throw new InvalidOperationException("Тест не найден.");
                 }
-                
+            var leftTime = test.PassTestTime == null ? 
+                DateTime.UtcNow.Add(TimeSpan.MaxValue) :
+                DateTime.UtcNow.Add(test.PassTestTime.Value);
+
                 if (userTest == null)
                 {
                     
@@ -47,7 +50,7 @@ namespace Service.Services
                         AttemptNumber = 1,
                         LeftAttemptsCount = test.AttemptsCount - 1,
                         State = TestState.Running,
-                        LeftTestTime = DateTime.UtcNow
+                        LeftTestTime = leftTime
                     };
                     
                     await _userTestRepository.CreateAsync(newUserTest);
@@ -59,7 +62,7 @@ namespace Service.Services
                         userTest.LeftAttemptsCount--;
                         userTest.AttemptNumber++;
                         userTest.State = TestState.Running;
-                        userTest.LeftTestTime = DateTime.UtcNow;
+                        userTest.LeftTestTime = leftTime;
                         await _userTestRepository.UpdateAsync(userTest);
                     }
                     else

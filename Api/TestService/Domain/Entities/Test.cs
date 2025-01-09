@@ -14,7 +14,7 @@ public record Test : BaseEntity<Guid>
     public int AttemptsCount { get; set; }
     public DateTime? StartTestTime { get; set; }
     public DateTime? EndTestTime { get; set; }
-    public DateTime? PassTestTime { get; set; }
+    public TimeSpan? PassTestTime { get; set; }
     public float MaxPoints { get; set; }
 
     public int QuestionsCount => Questions is null ? 0 : Questions.Count;
