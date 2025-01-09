@@ -7,7 +7,7 @@ namespace Infrastructure.Data;
 public class TestRepository : ITestStore
 {
     private readonly ApplicationDbContext _context;
-    
+
     public TestRepository(ApplicationDbContext context)
     {
         _context = context;
@@ -16,9 +16,17 @@ public class TestRepository : ITestStore
     public async Task<Test?> GetByIdAsync(Guid testId)
     {
         var testDbSet = _context.Tests;
-        
+
         return await testDbSet
             .Include(t => t.Questions)
+            .FirstOrDefaultAsync(t => t.Id == testId);
+    }
+
+    public async Task<Test?> GetByIdShortAsync(Guid testId)
+    {
+        var testDbSet = _context.Tests;
+
+        return await testDbSet
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
 
@@ -46,5 +54,21 @@ public class TestRepository : ITestStore
     {
         return await _context.Tests
             .Include(t => t.Questions).ToListAsync();
+    }
+
+    public async Task<List<Test?>> GetAllUserTestsAsync(Guid userId)
+    {
+        return await _context.Tests
+            .Where(t => t.OwnerId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<List<UserTest?>> GetCompletedAsync(Guid userId)
+    {
+        return await _context.UserTests
+            .Where(ut => 
+                ut.UserId == userId && 
+                ut.State == TestState.Completed)
+            .ToListAsync();
     }
 }

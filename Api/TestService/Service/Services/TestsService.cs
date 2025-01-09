@@ -41,6 +41,18 @@ public class TestsService: ITestService
         return testDto;
     }
 
+    public async Task<TestDto> GetByIdShortAsync(Guid id)
+    {
+        var testEntity = await _testStore.GetByIdShortAsync(id);
+        if (testEntity is null)
+        {
+            return null;
+        }
+
+        var testDto = _mapper.Map<TestDto>(testEntity);
+        return testDto;
+    }
+
     public async Task<Guid> CreateAsync(Test test)
     {
         var id = await _repository.CreateAsync(test);
@@ -96,5 +108,15 @@ public class TestsService: ITestService
         }
 
         return res; 
+    }
+
+    public async Task<List<Test?>> GetAllUserTestsAsync(Guid userId)
+    {
+        return await _testStore.GetAllUserTestsAsync(userId);
+    }
+
+    public async Task<List<UserTest?>> GetCompletedAsync(Guid userId)
+    {
+        return await _testStore.GetCompletedAsync(userId);
     }
 }
