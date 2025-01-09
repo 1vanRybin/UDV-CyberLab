@@ -10,6 +10,7 @@ public static class ServiceStartUp
     {
         serviceCollection.AddScoped<ITestService, TestsService>();
         serviceCollection.AddScoped<IQuestionService, QuestionService>();
+        serviceCollection.AddScoped<ITestPassingService, TestPassingService>();
         AddAutoMapper(serviceCollection);
         return serviceCollection;
     }

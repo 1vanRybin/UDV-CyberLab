@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.DTO;
 using Domain.Entities;
 using ExampleCore.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -42,17 +43,35 @@ public class TestController : ControllerBase
 
         return Ok(test);
     }
-    
+
+    [HttpGet("{id:guid}/short")]
+    [ProducesResponseType(typeof(Test), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Test>> GetShortTest(Guid id)
+    {
+        var test = await _testService.GetByIdShortAsync(id);
+
+        if (test == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(test);
+    }
+
     [HttpPost]
-    [ProducesResponseType(typeof(Test), StatusCodes.Status201Created)]
-    public async Task<ActionResult<Test>> CreateTest(Test test)
+    [ProducesResponseType(typeof(TestDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult> CreateTest(TestDto test)
     {
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
         }
 
-        var createdTest = await _testService.CreateAsync(test);
+        var ownerId = UserHelper.GetUserId(HttpContext.Request);
+        test.OwnerId = ownerId;
+        var domainTest = _mapper.Map<Test>(test);
+        var createdTest = await _testService.CreateAsync(domainTest);
 
         return CreatedAtAction(
             nameof(GetTest),
@@ -87,7 +106,7 @@ public class TestController : ControllerBase
         return NoContent();
     }
     
-    [HttpGet("user/results")]
+    [HttpGet("my")]
     public async Task<ActionResult<ICollection<UserTest>>> GetUserTestResults()
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
@@ -98,6 +117,34 @@ public class TestController : ControllerBase
             return NotFound();
         }
         
+        return Ok(results);
+    }
+
+    [HttpGet("created")]
+    public async Task<ActionResult<ICollection<UserTest>>> GetUserTests()
+    {
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var results = await _testService.GetAllUserTestsAsync(userId);
+
+        if (results is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(results);
+    }
+
+    [HttpGet("passed")]
+    public async Task<ActionResult<ICollection<UserTest>>> GetCompletedTests()
+    {
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var results = await _testService.GetCompletedAsync(userId);
+
+        if (results is null)
+        {
+            return NotFound();
+        }
+
         return Ok(results);
     }
 }

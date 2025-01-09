@@ -15,6 +15,8 @@ public static class InfrastuctureStartUp
         serviceCollection.TryAddScoped<IStandartStore, BaseRepository>();
         serviceCollection.TryAddScoped<ITestStore, TestRepository>();
         serviceCollection.TryAddScoped<IQuestionStore, QuestionRepository>();
+        serviceCollection.TryAddScoped<IUserAnswerRepository, UserAnswerRepository>();
+        serviceCollection.TryAddScoped<IUserTestRepository, UserTestRepository>();
 
         var connectionString = configurationManager.GetConnectionString("DefaultConnection");
 

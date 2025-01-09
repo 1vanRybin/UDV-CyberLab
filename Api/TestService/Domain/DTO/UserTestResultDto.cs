@@ -1,4 +1,6 @@
-﻿namespace Domain.DTO;
+﻿using Domain.Entities;
+
+namespace Domain.DTO;
 
 public class UserTestResultDto
 {
@@ -6,6 +8,12 @@ public class UserTestResultDto
     public string TestName { get; set; }
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
-    public float Points { get; set; }
+    public Guid UserId { get; set; }
+
+    public TestState State { get; set; }
+    public int AttemptNumber { get; set; }
+    public int LeftAttemptsCount { get; set; }
+    public float ScoredPoints { get; set; }
+    public DateTime LeftTestTime { get; set; }
     public bool IsChecked { get; set; }
 }
