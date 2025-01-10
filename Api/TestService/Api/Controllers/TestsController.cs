@@ -8,7 +8,7 @@ using Service.interfaces;
 namespace Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/Test")]
 [Produces("application/json")]
 public class TestController : ControllerBase
 {

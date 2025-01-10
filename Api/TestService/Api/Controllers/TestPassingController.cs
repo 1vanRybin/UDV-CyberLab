@@ -6,7 +6,7 @@ using Service.interfaces;
 namespace Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/TestPassing")]
     public class TestPassingController : ControllerBase
     {
         private readonly ITestPassingService _testPassingService;
