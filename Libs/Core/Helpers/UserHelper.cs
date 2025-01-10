@@ -7,7 +7,8 @@ public static class UserHelper
 {
     public static Guid GetUserId(HttpRequest request)
     {
-        var userId = Guid.Parse("0a227578-aae3-4aca-af25-4542e930fab3");
+        var token = request.Headers.Authorization.FirstOrDefault().ParseJwt();
+        var userId = Guid.Parse(token.Claims.FirstOrDefault(c => c.Type == "id").Value);
         return userId;
     }
     
