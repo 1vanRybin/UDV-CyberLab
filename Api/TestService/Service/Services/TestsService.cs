@@ -65,6 +65,7 @@ public class TestsService: ITestService
                 State = TestState.Idle,
                 AttemptNumber = 0,
                 LeftAttemptsCount = test.AttemptsCount,
+                MaxPoints = test.MaxPoints, 
                 ScoredPoints = 0,
                 IsChecked = false
             };
