@@ -46,7 +46,26 @@ public class TestsService: ITestService
         var testEntity = await _testStore.GetByIdShortAsync(id);
         if (testEntity is null)
         {
-            return null;
+            var test = await _testStore.GetByIdAsync(id);
+            if (test is null)
+            {
+                return null;
+            }
+
+            return new ShortTestDto()
+            {
+                TestId = test.Id,
+                Name = test.Name,
+                Description = test.Description,
+                Theme = test.Theme,
+                Difficulty = test.Difficulty,
+                OwnerId = test.OwnerId,
+                State = TestState.Idle,
+                AttemptNumber = 0,
+                LeftAttemptsCount = test.AttemptsCount,
+                ScoredPoints = 0,
+                IsChecked = false
+            };
         }
 
         var testDto = _mapper.Map<ShortTestDto>(testEntity);
