@@ -31,6 +31,7 @@ public class UserController : ControllerBase
         
         return Ok(new UserInfoResponse
         {
+            UserId = userId,
             UserName = result.UserName,
             Email = result.Email,
             Role = result.Role
