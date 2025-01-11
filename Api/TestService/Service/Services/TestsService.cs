@@ -60,6 +60,8 @@ public class TestsService: ITestService
                 Theme = test.Theme,
                 Difficulty = test.Difficulty,
                 OwnerId = test.OwnerId,
+                StartTestTime = test.StartTestTime, 
+                EndTestTime = test.EndTestTime,
                 State = TestState.Idle,
                 AttemptNumber = 0,
                 LeftAttemptsCount = test.AttemptsCount,

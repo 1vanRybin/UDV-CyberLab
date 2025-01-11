@@ -16,6 +16,9 @@ namespace Domain.DTO
         public string Difficulty { get; set; }
         public Guid OwnerId { get; set; }
 
+
+        public DateTime? StartTestTime { get; set; }
+        public DateTime? EndTestTime { get; set; }
         public TestState State { get; set; }
         public int AttemptNumber { get; set; }
         public int LeftAttemptsCount { get; set; }
