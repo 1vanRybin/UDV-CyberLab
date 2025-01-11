@@ -8,7 +8,7 @@ public interface ITestService
     Task<IEnumerable<TestDto>> GetAsync();
 
     Task<TestDto> GetByIdAsync(Guid id);
-    Task<TestDto> GetByIdShortAsync(Guid id);
+    Task<ShortTestDto> GetByIdShortAsync(Guid id);
 
     Task<Guid> CreateAsync(Test test);
 

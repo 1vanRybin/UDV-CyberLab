@@ -41,7 +41,7 @@ public class TestsService: ITestService
         return testDto;
     }
 
-    public async Task<TestDto> GetByIdShortAsync(Guid id)
+    public async Task<ShortTestDto> GetByIdShortAsync(Guid id)
     {
         var testEntity = await _testStore.GetByIdShortAsync(id);
         if (testEntity is null)
@@ -49,7 +49,7 @@ public class TestsService: ITestService
             return null;
         }
 
-        var testDto = _mapper.Map<TestDto>(testEntity);
+        var testDto = _mapper.Map<ShortTestDto>(testEntity);
         return testDto;
     }
 

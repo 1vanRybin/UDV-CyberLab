@@ -22,9 +22,9 @@ public class TestRepository : ITestStore
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
 
-    public async Task<Test?> GetByIdShortAsync(Guid testId)
+    public async Task<UserTest?> GetByIdShortAsync(Guid testId)
     {
-        var testDbSet = _context.Tests;
+        var testDbSet = _context.UserTests.Include(ut => ut.Test);
 
         return await testDbSet
             .FirstOrDefaultAsync(t => t.Id == testId);
@@ -60,6 +60,7 @@ public class TestRepository : ITestStore
     {
         return await _context.Tests
             .Where(t => t.OwnerId == userId)
+            .Include(t=>t.UserTests)
             .ToListAsync();
     }
 

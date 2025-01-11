@@ -45,9 +45,9 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("{id:guid}/short")]
-    [ProducesResponseType(typeof(Test), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ShortTestDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Test>> GetShortTest(Guid id)
+    public async Task<ActionResult<ShortTestDto>> GetShortTest(Guid id)
     {
         var test = await _testService.GetByIdShortAsync(id);
 
