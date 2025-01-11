@@ -27,7 +27,7 @@ public class TestRepository : ITestStore
         var testDbSet = _context.UserTests.Include(ut => ut.Test);
 
         return await testDbSet
-            .FirstOrDefaultAsync(t => t.Id == testId);
+            .FirstOrDefaultAsync(t => t.TestId == testId);
     }
 
     public async Task<ICollection<UserTest?>> GetUserTestResultsAsync(Guid userId)
