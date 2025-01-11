@@ -61,7 +61,7 @@ public class TestController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(typeof(TestDto), StatusCodes.Status201Created)]
-    public async Task<ActionResult> CreateTest(TestDto test)
+    public async Task<ActionResult> CreateTest([FromBody]TestDto test)
     {
         if (!ModelState.IsValid)
         {
