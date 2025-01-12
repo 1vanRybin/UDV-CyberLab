@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.DTO;
+using Domain.DTO.Answers;
 using Domain.Entities;
 using ExampleCore.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -163,7 +164,7 @@ public class TestController : ControllerBase
     }
     
     [HttpGet("results/{resulId:guid}/preview")]
-    public async Task<ActionResult<UserTest>> GetTestPreview([FromRoute] Guid resulId)
+    public async Task<ActionResult<UserPreviewResultDto>> GetTestPreview([FromRoute] Guid resulId)
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var result = await _testService.GetTestPreviewResult(resulId);
