@@ -147,4 +147,18 @@ public class TestController : ControllerBase
 
         return Ok(results);
     }
+
+    [HttpGet("{id:guid}/results")]
+    public async Task<ActionResult<ICollection<UserTest>>> GetTestResults(Guid testId)
+    {
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var results = await _testService.GetTestResultsAsync(userId, testId);
+
+        if (results is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(results);
+    }
 }

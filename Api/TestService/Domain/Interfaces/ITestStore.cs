@@ -13,4 +13,5 @@ public interface ITestStore
     Task<List<Test?>> GetAllAsync();
     Task<List<Test?>> GetAllUserTestsAsync(Guid userId);
     Task<List<UserTest?>> GetCompletedAsync(Guid userId);
+    Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId);
 }

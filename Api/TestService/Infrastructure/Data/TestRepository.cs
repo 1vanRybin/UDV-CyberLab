@@ -72,4 +72,15 @@ public class TestRepository : ITestStore
                 ut.State == TestState.Completed)
             .ToListAsync();
     }
+
+    public async Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId)
+    {
+        return await _context.UserTests
+            .Where(ut =>
+                ut.UserId == userId &&
+                ut.TestId == testId &&
+                ut.State == TestState.Completed)
+            .Include(t => t.Test)
+            .ToListAsync();
+    }
 }

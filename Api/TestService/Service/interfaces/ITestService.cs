@@ -20,4 +20,5 @@ public interface ITestService
     Task<ICollection<object>> GetAllQuestionsByTestIdAsync(Guid testId);
     Task<List<Test?>> GetAllUserTestsAsync(Guid userId);
     Task<List<UserTest?>> GetCompletedAsync(Guid userId);
+    Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId);
 }

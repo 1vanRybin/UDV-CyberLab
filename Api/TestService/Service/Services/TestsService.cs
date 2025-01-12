@@ -141,4 +141,9 @@ public class TestsService: ITestService
     {
         return await _testStore.GetCompletedAsync(userId);
     }
+
+    public async Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId)
+    {
+        return await _testStore.GetTestResultsAsync(userId, testId);
+    }
 }
