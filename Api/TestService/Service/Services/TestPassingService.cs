@@ -377,7 +377,7 @@ namespace Service.Services
 
         return resultDto;
     }
-        
+
      private async Task<float> CalculateScore(Guid testId, Guid userId)
         {
             var test = await _testRepository.GetByIdAsync(testId);

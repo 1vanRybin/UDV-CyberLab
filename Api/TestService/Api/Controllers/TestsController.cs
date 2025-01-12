@@ -45,6 +45,21 @@ public class TestController : ControllerBase
         return Ok(test);
     }
 
+    [HttpGet("userTest/{id:guid}")]
+    [ProducesResponseType(typeof(Test), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<Test>> GetUserTest(Guid id)
+    {
+        var userTest = await _testService.GetUserTestByIdAsync(id);
+
+        if (userTest == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(userTest);
+    }
+
     [HttpGet("{id:guid}/short")]
     [ProducesResponseType(typeof(ShortTestDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

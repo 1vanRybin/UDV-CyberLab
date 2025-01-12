@@ -49,6 +49,18 @@ public class TestsService: ITestService
         return testDto;
     }
 
+
+    public async Task<UserTest> GetUserTestByIdAsync(Guid userTestId)
+    {
+        var userTest = await _repository.GetByIdAsync<UserTest>(userTestId);
+        if (userTest is null)
+        {
+            return null;
+        }
+
+        return userTest;    
+    }
+
     public async Task<ShortTestDto> GetByIdShortAsync(Guid id)
     {
         var testEntity = await _testStore.GetByIdShortAsync(id);

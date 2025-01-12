@@ -11,6 +11,7 @@ public interface ITestService
 
     Task<TestDto> GetByIdAsync(Guid id);
     Task<ShortTestDto> GetByIdShortAsync(Guid id);
+    Task<UserTest> GetUserTestByIdAsync(Guid userTestId)
 
     Task<Guid> CreateAsync(Test test);
 
