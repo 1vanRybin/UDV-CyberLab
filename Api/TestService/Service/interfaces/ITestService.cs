@@ -1,4 +1,6 @@
 ﻿using Domain.DTO;
+using Domain.DTO.Answers;
+using Domain.DTO.Questions;
 using Domain.Entities;
 
 namespace Service.interfaces;
@@ -21,4 +23,5 @@ public interface ITestService
     Task<List<Test?>> GetAllUserTestsAsync(Guid userId);
     Task<List<UserTest?>> GetCompletedAsync(Guid userId);
     Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId);
+    Task<UserPreviewResultDto?> GetTestPreviewResult(Guid resultId);
 }

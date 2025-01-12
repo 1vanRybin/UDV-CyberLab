@@ -1,7 +1,10 @@
 using AutoMapper;
 using Domain.DTO;
+using Domain.DTO.Answers;
+using Domain.DTO.Questions;
 using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Service.interfaces;
 
 namespace Service.Services;
@@ -10,13 +13,18 @@ public class TestsService: ITestService
 {
     private readonly IStandartStore _repository;
     private readonly ITestStore _testStore;
+    private readonly IUserAnswerRepository _userAnswerRepository;
     private readonly IMapper _mapper;
+    private readonly IQuestionStore _questionStore;
+    
 
-    public TestsService(IStandartStore repository, ITestStore testStore, IMapper mapper)
+    public TestsService(IStandartStore repository, ITestStore testStore, IMapper mapper, IUserAnswerRepository userAnswerRepository, IQuestionStore questionStore)
     {
         _testStore = testStore;
         _repository = repository;
         _mapper = mapper;
+        _userAnswerRepository = userAnswerRepository;
+        _questionStore = questionStore;
     }
 
     public async Task<IEnumerable<TestDto>> GetAsync()
@@ -145,5 +153,41 @@ public class TestsService: ITestService
     public async Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId)
     {
         return await _testStore.GetTestResultsAsync(userId, testId);
+    }
+
+    public async Task<UserPreviewResultDto?> GetTestPreviewResult(Guid resultId)
+    {
+        var userTest = await _testStore.GetUserTest(resultId);
+        if (userTest is null)
+        {
+            return null;
+        }
+        
+        var userAnswer = await _userAnswerRepository.GetAllByUserTestIdAsync(resultId);
+        var result = new UserPreviewResultDto
+        {
+            UserId = userTest.UserId,
+            Questions = userAnswer.Select(answer => new QuestionResultDto
+            {
+                QuestionText = answer. QuestionText,
+                QuestionId = answer.QuestionId,
+                UserAnswerText = answer.AnswerText,
+                CorrectAnswerText = answer.CorrectText,
+                UserChoices = answer.VariantChoices,
+                CorrectChoices = answer.CorrectChoices,
+                UserCompliances = answer.ComplianceData,
+                CorrectCompliances = answer.CorrectData,
+                HasUserFile = !string.IsNullOrEmpty(answer.FileContent),
+                IsCorrect = (answer.AnswerText == answer.CorrectText) 
+                            && ((answer.VariantChoices == null && answer.CorrectChoices == null) || 
+                                (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices))) 
+                            && ((answer.ComplianceData == null && answer.CorrectData == null) || 
+                                (answer.ComplianceData != null && answer.CorrectData != null 
+                                                               && answer.ComplianceData.OrderBy(kv => kv.Key).SequenceEqual(answer.CorrectData.OrderBy(kv => kv.Key))))
+            }).ToList()
+        };
+        
+        
+        return result;
     }
 }

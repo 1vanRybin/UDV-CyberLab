@@ -19,7 +19,7 @@ public class UserAnswerRepository : IUserAnswerRepository
             .Where(a => a.UserTestId == userTestId)
             .ToListAsync();
     }
-
+    
     public async Task<Guid> CreateOrUpdateAsync(UserAnswer userAnswer)
     {
         if (userAnswer.Id != Guid.Empty)

@@ -49,7 +49,7 @@ public class TestRepository : ITestStore
             .SelectMany(t => t.Questions)
             .ToListAsync();
     }
-
+    
     public async Task<List<Test?>> GetAllAsync()
     {
         return await _context.Tests
@@ -82,5 +82,13 @@ public class TestRepository : ITestStore
                 ut.State == TestState.Completed)
             .Include(t => t.Test)
             .ToListAsync();
+    }
+
+    public async Task<UserTest?> GetUserTest(Guid resultId)
+    {
+        return await _context.UserTests
+            .Include(ut => ut.Test)
+            .Include(ut => ut.Test.Questions)
+            .FirstOrDefaultAsync(ut => ut.Id == resultId);
     }
 }

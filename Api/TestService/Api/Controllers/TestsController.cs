@@ -148,7 +148,7 @@ public class TestController : ControllerBase
         return Ok(results);
     }
 
-    [HttpGet("{id:guid}/results")]
+    [HttpGet("{testId:guid}/results")]
     public async Task<ActionResult<ICollection<UserTest>>> GetTestResults(Guid testId)
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
@@ -160,5 +160,23 @@ public class TestController : ControllerBase
         }
 
         return Ok(results);
+    }
+    
+    [HttpGet("results/{resulId:guid}/preview")]
+    public async Task<ActionResult<UserTest>> GetTestPreview([FromRoute] Guid resulId)
+    {
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var result = await _testService.GetTestPreviewResult(resulId);
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        if (result.UserId != userId)
+        {
+            return BadRequest("Тест не этого пользователя");
+        }
+        
+        return Ok(result);
     }
 }

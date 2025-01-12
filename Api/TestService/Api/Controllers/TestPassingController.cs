@@ -26,18 +26,23 @@ namespace Api.Controllers
         [HttpPost("{testId}/start")]
         public async Task<IActionResult> StartTest(Guid testId)
         {
-            await _testPassingService.StartTestAsync(testId, UserHelper.GetUserId(HttpContext.Request));
-            return Ok("Тест начат");
+            var userTestID =
+                await _testPassingService.StartTestAsync(testId, UserHelper.GetUserId(HttpContext.Request));
+            return Ok(new 
+            {
+                UserTestId = userTestID
+            });
         }
 
         [HttpPost("{testId}/answer")]
-        public async Task<IActionResult> SaveAnswers(Guid testId, [FromBody] UserAnswersDto userAnswersDto)
+        public async Task<IActionResult> SaveAnswers(Guid testId, [FromBody] UserAnswersDto userPreviewResultDto)
         {
-            await _testPassingService.SaveAnswersAsync(testId, UserHelper.GetUserId(HttpContext.Request), userAnswersDto);
+            await _testPassingService.SaveAnswersAsync(testId, UserHelper.GetUserId(HttpContext.Request), userPreviewResultDto);
             return Ok();
         }
 
         [HttpPost("{testId}/finish")]
+        [ProducesResponseType(typeof(FinishedTestResultDto), StatusCodes.Status200OK)]
         public async Task<IActionResult> FinishTest(Guid testId)
         {
             var score = await _testPassingService.FinishTestAsync(testId, UserHelper.GetUserId(HttpContext.Request));

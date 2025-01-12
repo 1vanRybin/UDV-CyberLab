@@ -26,7 +26,7 @@ namespace Service.Services
                 _userAnswerRepository = userAnswerRepository;
             }
 
-            public async Task StartTestAsync(Guid testId, Guid userId)
+            public async Task<Guid> StartTestAsync(Guid testId, Guid userId)
             {
                 await СheckTestTime(testId);
                 var userTest = await _userTestRepository.GetLatestByUserAndTestAsync(userId, testId);
@@ -35,9 +35,9 @@ namespace Service.Services
                 {
                     throw new InvalidOperationException("Тест не найден.");
                 }
-            var leftTime = test.PassTestTime == null ? 
-                DateTime.UtcNow.Add(TimeSpan.MaxValue) :
-                DateTime.UtcNow.Add(test.PassTestTime.Value);
+                var leftTime = test.PassTestTime == null ? 
+                    DateTime.UtcNow.AddDays(500) :
+                    DateTime.UtcNow.Add(test.PassTestTime.Value);
 
                 if (userTest == null)
                 {
@@ -54,46 +54,53 @@ namespace Service.Services
                     };
                     
                     await _userTestRepository.CreateAsync(newUserTest);
+                    
+                    return newUserTest.Id;
+                }
+
+                if (userTest.LeftAttemptsCount > 0)
+                {
+                    userTest.LeftAttemptsCount--;
+                    userTest.AttemptNumber++;
+                    userTest.State = TestState.Running;
+                    userTest.LeftTestTime = leftTime;
+                    await _userTestRepository.UpdateAsync(userTest);
                 }
                 else
                 {
-                    if (userTest.LeftAttemptsCount > 0)
-                    {
-                        userTest.LeftAttemptsCount--;
-                        userTest.AttemptNumber++;
-                        userTest.State = TestState.Running;
-                        userTest.LeftTestTime = leftTime;
-                        await _userTestRepository.UpdateAsync(userTest);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("Нет доступных попыток для прохождения теста.");
-                    }
+                    throw new InvalidOperationException("Нет доступных попыток для прохождения теста.");
                 }
+
+                return userTest.Id;
             } 
             
-            public async Task SaveAnswersAsync(Guid testId, Guid userId, UserAnswersDto userAnswersDto)
+            public async Task SaveAnswersAsync(Guid testId, Guid userId, UserAnswersDto userPreviewResultDto)
             {
                 var userTest = await _userTestRepository.GetLatestByUserAndTestAsync(userId, testId);
-                if (userTest == null || userTest.Id != userAnswersDto.UserTestId)
+                if (userTest == null || userTest.Id != userPreviewResultDto.UserTestId)
                 {
                     throw new InvalidOperationException("Тест не был начат, не существует или не соответствует UserTestId.");
                 }
 
                 await СheckTestTime(testId);
                 
-                if (userAnswersDto.OpenAnswers != null)
+                if (userPreviewResultDto.OpenAnswers != null)
                 {
-                    foreach (var openAnswer in userAnswersDto.OpenAnswers)
+                    foreach (var openAnswer in userPreviewResultDto.OpenAnswers)
                     {
                         var question = await _questionRepository.GetByIdAsync(openAnswer.QuestionId);
-                        if (question == null) continue;
-                        
+                        if (question is not QuestionOpen questionOpen)
+                        {
+                            continue;
+                        }
+
                         var userAnswer = new UserAnswer
                         {
                             UserTestId = userTest.Id,
                             QuestionId = openAnswer.QuestionId,
-                            AnswerText = openAnswer.AnswerText
+                            QuestionText = question.Text,
+                            AnswerText = openAnswer.AnswerText,
+                            CorrectText =  questionOpen.Answer
                         };
                         
                         if (openAnswer.UserAnswerId != Guid.Empty)
@@ -105,18 +112,23 @@ namespace Service.Services
                     }
                 }
                 
-                if (userAnswersDto.VariantAnswers != null)
+                if (userPreviewResultDto.VariantAnswers != null)
                 {
-                    foreach (var variantAnswer in userAnswersDto.VariantAnswers)
+                    foreach (var variantAnswer in userPreviewResultDto.VariantAnswers)
                     {
                         var question = await _questionRepository.GetByIdAsync(variantAnswer.QuestionId);
-                        if (question == null) continue;
-
+                        if (question is not QuestionVariant questionVariant)
+                        {
+                            continue;
+                        }
+                        
                         var userAnswer = new UserAnswer
                         {
                             UserTestId = userTest.Id,
                             QuestionId = variantAnswer.QuestionId,
-                            VariantChoices = variantAnswer.SelectedAnswers
+                            QuestionText = question.Text,
+                            VariantChoices = variantAnswer.SelectedAnswers,
+                            CorrectChoices = questionVariant.CorrectAnswers
                         };
                         
                         if (variantAnswer.UserAnswerId != Guid.Empty)
@@ -128,18 +140,23 @@ namespace Service.Services
                     }
                 }
                 
-                if (userAnswersDto.ComplianceAnswers != null)
+                if (userPreviewResultDto.ComplianceAnswers != null)
                 {
-                    foreach (var complianceAnswer in userAnswersDto.ComplianceAnswers)
+                    foreach (var complianceAnswer in userPreviewResultDto.ComplianceAnswers)
                     {
                         var question = await _questionRepository.GetByIdAsync(complianceAnswer.QuestionId);
-                        if (question == null) continue;
+                        if (question is not QuestionCompliance questionCompliance)
+                        {
+                            continue;
+                        }
 
                         var userAnswer = new UserAnswer
                         {
                             UserTestId = userTest.Id,
+                            QuestionText = question.Text,
                             QuestionId = complianceAnswer.QuestionId,
-                            ComplianceData = complianceAnswer.UserCompliances
+                            ComplianceData = complianceAnswer.UserCompliances,
+                            CorrectData = questionCompliance.RightCompliances,
                         };
                         
                         if (complianceAnswer.UserAnswerId != Guid.Empty)
@@ -151,9 +168,9 @@ namespace Service.Services
                     }
                 }
 
-                if (userAnswersDto.FileAnswers != null)
+                if (userPreviewResultDto.FileAnswers != null)
                 {
-                    foreach (var fileAnswer in userAnswersDto.FileAnswers)
+                    foreach (var fileAnswer in userPreviewResultDto.FileAnswers)
                     {
                         var question = await _questionRepository.GetByIdAsync(fileAnswer.QuestionId);
                         if (question == null) continue;
@@ -161,6 +178,7 @@ namespace Service.Services
                         var userAnswer = new UserAnswer
                         {
                             UserTestId = userTest.Id,
+                            QuestionText = question.Text,
                             QuestionId = fileAnswer.QuestionId,
                             FileContent = fileAnswer.UserFileContent
                         };
@@ -298,6 +316,7 @@ namespace Service.Services
         {
             var questionResult = new QuestionResultDto
             {
+                SortOrder = question.SortOrder,
                 QuestionId = question.Id,
                 QuestionText = question.Text
             };
