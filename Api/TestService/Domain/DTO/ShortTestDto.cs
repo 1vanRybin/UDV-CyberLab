@@ -24,6 +24,7 @@ namespace Domain.DTO
         public int LeftAttemptsCount { get; set; }
         public float MaxPoints { get; set; }
         public float ScoredPoints { get; set; }
+        public TimeSpan? PassTestTime { get; set; }
         public DateTime LeftTestTime { get; set; }
         public bool IsChecked { get; set; }
     }

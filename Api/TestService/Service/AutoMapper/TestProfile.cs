@@ -29,6 +29,7 @@ namespace Service.AutoMapper
            .ForMember(dest => dest.MaxPoints, opt => opt.MapFrom(src => src.Test.MaxPoints))
            .ForMember(dest => dest.LeftAttemptsCount, opt => opt.MapFrom(src => src.LeftAttemptsCount))
            .ForMember(dest => dest.ScoredPoints, opt => opt.MapFrom(src => src.ScoredPoints))
+           .ForMember(dest => dest.PassTestTime, opt => opt.MapFrom(src => src.Test.PassTestTime))
            .ForMember(dest => dest.LeftTestTime, opt => opt.MapFrom(src => src.LeftTestTime))
            .ForMember(dest => dest.IsChecked, opt => opt.MapFrom(src => src.IsChecked));
         }

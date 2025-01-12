@@ -86,6 +86,7 @@ public class TestsService: ITestService
                 AttemptNumber = 0,
                 LeftAttemptsCount = test.AttemptsCount,
                 MaxPoints = test.MaxPoints, 
+                PassTestTime = test.PassTestTime,
                 ScoredPoints = 0,
                 IsChecked = false
             };
