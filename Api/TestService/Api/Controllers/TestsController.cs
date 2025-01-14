@@ -98,9 +98,26 @@ public class TestController : ControllerBase
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateTest(Test test)
+    public async Task<IActionResult> UpdateTest([FromBody] UpdateTestDto test)
     {
-        var updatedTest = await _testService.UpdateAsync(test);
+        var updatedTest = await _testService.UpdateAsync(new Test
+        {
+            Id = test.Id,
+            Name = test.Name,
+            Theme = test.Theme,
+            Description = test.Description,
+            Difficulty = test.Difficulty,
+            AttemptsCount = test.AttemptsCount,
+            StartTestTime = test.StartTestTime,
+            EndTestTime = test.EndTestTime,
+            PassTestTime = test.PassTestTime,
+            MaxPoints = test.MaxPoints,
+        });
+
+        if (updatedTest is null)
+        {
+            return NotFound("Test was not found!");
+        }
 
         return CreatedAtAction(
             nameof(UpdateTest),

@@ -17,7 +17,7 @@ public interface ITestService
 
     Task<TestDto?> DeleteAsync(Guid id);
 
-    Task<TestDto> UpdateAsync(Test test);
+    Task<TestDto?> UpdateAsync(Test test);
 
     Task<ICollection<UserTestResultDto>?> GetUserTestResultsAsync(Guid userId);
     Task<ICollection<object>> GetAllQuestionsByTestIdAsync(Guid testId);
