@@ -95,7 +95,7 @@ public class TestController : ControllerBase
             createdTest);
     }
 
-    [HttpPut("{id:guid}")]
+    [HttpPut]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateTest([FromBody] UpdateTestDto test)
