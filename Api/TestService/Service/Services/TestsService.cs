@@ -16,7 +16,7 @@ public class TestsService: ITestService
     private readonly IUserAnswerRepository _userAnswerRepository;
     private readonly IMapper _mapper;
     private readonly IQuestionStore _questionStore;
-    
+
 
     public TestsService(IStandartStore repository, ITestStore testStore, IMapper mapper, IUserAnswerRepository userAnswerRepository, IQuestionStore questionStore)
     {
@@ -42,7 +42,7 @@ public class TestsService: ITestService
         {
             return null;
         }
-        
+
         var testDto = _mapper.Map<TestDto>(testEntity);
 
         testDto.Questions = await GetAllQuestionsByTestIdAsync(id);
@@ -58,7 +58,7 @@ public class TestsService: ITestService
             return null;
         }
 
-        return userTest;    
+        return userTest;
     }
 
     public async Task<ShortTestDto> GetByIdShortAsync(Guid id)
@@ -80,12 +80,12 @@ public class TestsService: ITestService
                 Theme = test.Theme,
                 Difficulty = test.Difficulty,
                 OwnerId = test.OwnerId,
-                StartTestTime = test.StartTestTime, 
+                StartTestTime = test.StartTestTime,
                 EndTestTime = test.EndTestTime,
                 State = TestState.Idle,
                 AttemptNumber = 0,
                 LeftAttemptsCount = test.AttemptsCount,
-                MaxPoints = test.MaxPoints, 
+                MaxPoints = test.MaxPoints,
                 PassTestTime = test.PassTestTime,
                 ScoredPoints = 0,
                 IsChecked = false
@@ -101,24 +101,40 @@ public class TestsService: ITestService
         var id = await _repository.CreateAsync(test);
         return id;
     }
-    
+
     public async Task<TestDto?> DeleteAsync(Guid id)
     {
         var test = await _repository.GetByIdAsync<Test>(id);
-        if (test is null) 
+        if (test is null)
         {
             return null;
         }
-        
+
         var deleteResult = await _repository.DeleteAsync(test);
 
         return deleteResult ? _mapper.Map<TestDto>(test) : null;
     }
 
-    public async Task<TestDto> UpdateAsync(Test test)
+    public async Task<TestDto?> UpdateAsync(Test test)
     {
-        //todo подумать о том, что если тут вдруг ошибка будет.
+        var curTest = await _repository.GetByIdAsync<Test>(test.Id);
+        if (curTest is null)
+        {
+            return null;
+        }
+
+        curTest.Name = test.Name;
+        curTest.Theme = test.Theme;
+        curTest.Description = test.Description;
+        curTest.Difficulty = test.Difficulty;
+        curTest.AttemptsCount = test.AttemptsCount;
+        curTest.StartTestTime = test.StartTestTime;
+        curTest.EndTestTime = test.EndTestTime;
+        curTest.PassTestTime = test.PassTestTime;
+        curTest.MaxPoints = test.MaxPoints;
+
         var testDto = await _repository.UpdateAsync(test);
+
         return _mapper.Map<TestDto>(testDto);
     }
 
@@ -150,7 +166,7 @@ public class TestsService: ITestService
             res.Add(questionRes);
         }
 
-        return res; 
+        return res;
     }
 
     public async Task<List<Test?>> GetAllUserTestsAsync(Guid userId)
@@ -175,7 +191,7 @@ public class TestsService: ITestService
         {
             return null;
         }
-        
+
         var userAnswer = await _userAnswerRepository.GetAllByUserTestIdAsync(resultId);
         var result = new UserPreviewResultDto
         {
@@ -191,16 +207,16 @@ public class TestsService: ITestService
                 UserCompliances = answer.ComplianceData,
                 CorrectCompliances = answer.CorrectData,
                 HasUserFile = !string.IsNullOrEmpty(answer.FileContent),
-                IsCorrect = (answer.AnswerText == answer.CorrectText) 
-                            && ((answer.VariantChoices == null && answer.CorrectChoices == null) || 
-                                (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices))) 
-                            && ((answer.ComplianceData == null && answer.CorrectData == null) || 
-                                (answer.ComplianceData != null && answer.CorrectData != null 
+                IsCorrect = (answer.AnswerText == answer.CorrectText)
+                            && ((answer.VariantChoices == null && answer.CorrectChoices == null) ||
+                                (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices)))
+                            && ((answer.ComplianceData == null && answer.CorrectData == null) ||
+                                (answer.ComplianceData != null && answer.CorrectData != null
                                                                && answer.ComplianceData.OrderBy(kv => kv.Key).SequenceEqual(answer.CorrectData.OrderBy(kv => kv.Key))))
             }).ToList()
         };
-        
-        
+
+
         return result;
     }
 
