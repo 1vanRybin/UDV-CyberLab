@@ -1,13 +1,13 @@
 ﻿using Domain.DTO.Answers;
+using Domain.Entities;
 
 namespace Domain.DTO.Questions
 {
     public class QuestionUpdateDto
     {
-        public Guid Id { get; set; } 
-        public OpenAnswerDto? OpenAnswer { get; set; }
-        public VariantAnswerDto? VariantAnswer { get; set; }
-        public ComplianceAnswerDto? ComplianceAnswer { get; set; }
-        public FileAnswerDto? FileAnswer { get; set; }
+        public QuestionOpenDto? OpenAnswer { get; set; }
+        public QuestionVariantDto? VariantAnswer { get; set; }
+        public QuestionComplianceDto? ComplianceAnswer { get; set; }
+        public QuestionFileDto? FileAnswer { get; set; }
     }
 }

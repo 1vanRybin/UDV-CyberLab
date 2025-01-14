@@ -20,13 +20,13 @@ public class QuestionService : IQuestionService
     {
         _repository = repository;
         _questionRepository = questionRepository;
-        _mapper = mapper;   
+        _mapper = mapper;
     }
-    
+
     public async Task<IQuestionBase> GetByIdAsync(Guid questionId)
     {
         var question = await _questionRepository.GetByIdAsync(questionId);
-        
+
         return question switch
         {
             QuestionCompliance compliance => compliance,
@@ -44,12 +44,12 @@ public class QuestionService : IQuestionService
         {
             return Guid.Empty;
         }
-        
+
         var result = await _repository.CreateAsync(question);
-        
+
         return result;
     }
-    
+
     public async Task<Guid> DeleteAsync(Guid questionId)
     {
         var target = await _repository.GetByIdAsync<QuestionBase>(questionId);
@@ -57,14 +57,14 @@ public class QuestionService : IQuestionService
         {
             return Guid.Empty;
         }
-        
-        
+
+
         var result = await _repository.DeleteAsync(target);
         if (result)
         {
             return questionId;
         }
-        
+
         return Guid.Empty;
     }
 
@@ -74,15 +74,18 @@ public class QuestionService : IQuestionService
         {
             return await _repository.UpdateAsync(_mapper.Map<QuestionCompliance>(questionDto.ComplianceAnswer));
         }
-        else if(questionDto.VariantAnswer is not null)
+
+        if(questionDto.VariantAnswer is not null)
         {
             return await _repository.UpdateAsync(_mapper.Map<QuestionVariant>(questionDto.VariantAnswer));
         }
-        else if (questionDto.FileAnswer is not null)
+
+        if (questionDto.FileAnswer is not null)
         {
             return await _repository.UpdateAsync(_mapper.Map<QuestionFile>(questionDto.FileAnswer));
         }
-        else if (questionDto.OpenAnswer is not null)
+
+        if (questionDto.OpenAnswer is not null)
         {
             return await _repository.UpdateAsync(_mapper.Map<QuestionOpen>(questionDto.OpenAnswer));
         }
