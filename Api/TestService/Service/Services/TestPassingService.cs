@@ -35,13 +35,13 @@ namespace Service.Services
                 {
                     throw new InvalidOperationException("Тест не найден.");
                 }
-                var leftTime = test.PassTestTime == null ? 
+                var leftTime = test.PassTestTime == null ?
                     DateTime.UtcNow.AddDays(500) :
                     DateTime.UtcNow.Add(test.PassTestTime.Value);
 
                 if (userTest == null)
                 {
-                    
+
                     var newUserTest = new UserTest
                     {
                         Id = Guid.NewGuid(),
@@ -52,9 +52,9 @@ namespace Service.Services
                         State = TestState.Running,
                         LeftTestTime = leftTime
                     };
-                    
+
                     await _userTestRepository.CreateAsync(newUserTest);
-                    
+
                     return newUserTest.Id;
                 }
 
@@ -72,8 +72,8 @@ namespace Service.Services
                 }
 
                 return userTest.Id;
-            } 
-            
+            }
+
             public async Task SaveAnswersAsync(Guid testId, Guid userId, UserAnswersDto userPreviewResultDto)
             {
                 var userTest = await _userTestRepository.GetLatestByUserAndTestAsync(userId, testId);
@@ -83,7 +83,7 @@ namespace Service.Services
                 }
 
                 await СheckTestTime(testId);
-                
+
                 if (userPreviewResultDto.OpenAnswers != null)
                 {
                     foreach (var openAnswer in userPreviewResultDto.OpenAnswers)
@@ -102,7 +102,7 @@ namespace Service.Services
                             AnswerText = openAnswer.AnswerText,
                             CorrectText =  questionOpen.Answer
                         };
-                        
+
                         if (openAnswer.UserAnswerId != Guid.Empty)
                         {
                             userAnswer.Id = openAnswer.UserAnswerId;
@@ -111,7 +111,7 @@ namespace Service.Services
                         await _userAnswerRepository.CreateOrUpdateAsync(userAnswer);
                     }
                 }
-                
+
                 if (userPreviewResultDto.VariantAnswers != null)
                 {
                     foreach (var variantAnswer in userPreviewResultDto.VariantAnswers)
@@ -121,7 +121,7 @@ namespace Service.Services
                         {
                             continue;
                         }
-                        
+
                         var userAnswer = new UserAnswer
                         {
                             UserTestId = userTest.Id,
@@ -130,16 +130,16 @@ namespace Service.Services
                             VariantChoices = variantAnswer.SelectedAnswers,
                             CorrectChoices = questionVariant.CorrectAnswers
                         };
-                        
+
                         if (variantAnswer.UserAnswerId != Guid.Empty)
                         {
                             userAnswer.Id = variantAnswer.UserAnswerId;
                         }
-                        
+
                         await _userAnswerRepository.CreateOrUpdateAsync(userAnswer);
                     }
                 }
-                
+
                 if (userPreviewResultDto.ComplianceAnswers != null)
                 {
                     foreach (var complianceAnswer in userPreviewResultDto.ComplianceAnswers)
@@ -158,12 +158,12 @@ namespace Service.Services
                             ComplianceData = complianceAnswer.UserCompliances,
                             CorrectData = questionCompliance.RightCompliances,
                         };
-                        
+
                         if (complianceAnswer.UserAnswerId != Guid.Empty)
                         {
                             userAnswer.Id = complianceAnswer.UserAnswerId;
                         }
-                        
+
                         await _userAnswerRepository.CreateOrUpdateAsync(userAnswer);
                     }
                 }
@@ -182,12 +182,12 @@ namespace Service.Services
                             QuestionId = fileAnswer.QuestionId,
                             FileContent = fileAnswer.UserFileContent
                         };
-                        
+
                         if (fileAnswer.UserAnswerId != Guid.Empty)
                         {
                             userAnswer.Id = fileAnswer.UserAnswerId;
                         }
-                        
+
                         await _userAnswerRepository.CreateOrUpdateAsync(userAnswer);
                     }
                 }
@@ -198,15 +198,15 @@ namespace Service.Services
                 var test = await _testRepository.GetByIdAsync(testId);
                 if (test == null)
                     throw new InvalidOperationException("Тест не найден.");
-                
+
                 var now = DateTime.UtcNow;
-                
+
                 if (test.EndTestTime.HasValue && now > test.EndTestTime.Value)
                 {
                     throw new InvalidOperationException("Время прохождения теста истекло. Ответы не сохраняются.");
                 }
-            } 
-            
+            }
+
             public async Task<UserAnswersDto> GetSavedAnswersAsync(Guid testId, Guid userId)
         {
             await СheckTestTime(testId);
@@ -234,6 +234,7 @@ namespace Service.Services
                 {
                     userAnswersDto.OpenAnswers.Add(new OpenAnswerDto
                     {
+                        UserAnswerId = answer.Id,
                         QuestionId = answer.QuestionId,
                         AnswerText = answer.AnswerText
                     });
@@ -242,6 +243,7 @@ namespace Service.Services
                 {
                     userAnswersDto.VariantAnswers.Add(new VariantAnswerDto
                     {
+                        UserAnswerId = answer.Id,
                         QuestionId = answer.QuestionId,
                         SelectedAnswers = answer.VariantChoices ?? Array.Empty<int>()
                     });
@@ -250,6 +252,7 @@ namespace Service.Services
                 {
                     userAnswersDto.ComplianceAnswers.Add(new ComplianceAnswerDto
                     {
+                        UserAnswerId = answer.Id,
                         QuestionId = answer.QuestionId,
                         UserCompliances = answer.ComplianceData
                     });
@@ -258,6 +261,7 @@ namespace Service.Services
                 {
                     userAnswersDto.FileAnswers.Add(new FileAnswerDto
                     {
+                        UserAnswerId = answer.Id,
                         QuestionId = answer.QuestionId,
                         UserFileContent = answer.FileContent
                     });
@@ -274,10 +278,10 @@ namespace Service.Services
                 {
                     throw new InvalidOperationException("Тест не был начат или уже завершён.");
                 }
-                
+
                 var finalScore = await CalculateScore(testId, userId);
 
-   
+
                 userTest.State = TestState.Completed;
                 userTest.IsChecked = true;
                 userTest.ScoredPoints = finalScore;
@@ -288,8 +292,8 @@ namespace Service.Services
 
                 return finishedTestResult;
             }
-            
-            
+
+
     private async Task<FinishedTestResultDto> BuildFinishedTestResultDto(Guid testId, Guid userId, float finalScore)
     {
         var test = await _testRepository.GetByIdAsync(testId);
@@ -383,7 +387,7 @@ namespace Service.Services
             var test = await _testRepository.GetByIdAsync(testId);
             if (test == null || test.Questions == null || !test.Questions.Any())
                 return 0;
-            
+
             var userTest = await _userTestRepository.GetByUserAndTestAsync(userId, testId);
             if (userTest == null)
                 return 0;
@@ -391,7 +395,7 @@ namespace Service.Services
             var userAnswers = await _userAnswerRepository.GetAllByUserTestIdAsync(userTest.Id);
 
             float totalScore = 0;
-            
+
             foreach (var question in test.Questions)
             {
                 if (question is QuestionOpen openQuestion)
@@ -411,7 +415,7 @@ namespace Service.Services
                     {
                         var selectedSet = new HashSet<int>(userAnswer.VariantChoices);
                         var correctSet = new HashSet<int>(variantQuestion.CorrectAnswers);
-       
+
                         if (selectedSet.SetEquals(correctSet))
                         {
                             totalScore += variantQuestion.Points;
@@ -449,7 +453,7 @@ namespace Service.Services
                     }
                 }
             }
-            
+
             if (test.MaxPoints > 0 && totalScore > test.MaxPoints)
             {
                 totalScore = test.MaxPoints;
