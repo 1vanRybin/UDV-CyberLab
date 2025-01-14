@@ -133,7 +133,7 @@ public class TestsService: ITestService
         curTest.PassTestTime = test.PassTestTime;
         curTest.MaxPoints = test.MaxPoints;
 
-        var testDto = await _repository.UpdateAsync(test);
+        var testDto = await _repository.UpdateAsync(curTest);
 
         return _mapper.Map<TestDto>(testDto);
     }
