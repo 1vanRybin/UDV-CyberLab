@@ -21,7 +21,7 @@ public class TestController : ControllerBase
         _testService = testService;
         _mapper = mapper;
     }
-    
+
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Test>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<Test>>> GetTests()
@@ -29,14 +29,14 @@ public class TestController : ControllerBase
         var tests = await _testService.GetAsync();
         return Ok(tests);
     }
-    
+
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(Test), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(TestDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Test>> GetTest(Guid id)
+    public async Task<ActionResult<TestDto>> GetTest(Guid id)
     {
         var test = await _testService.GetByIdAsync(id);
-        
+
         if (test == null)
         {
             return NotFound();
@@ -94,14 +94,14 @@ public class TestController : ControllerBase
             new { id = createdTest },
             createdTest);
     }
-    
+
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateTest(Test test)
     {
         var updatedTest = await _testService.UpdateAsync(test);
-        
+
         return CreatedAtAction(
             nameof(UpdateTest),
             new { id = updatedTest.Id },
@@ -118,21 +118,21 @@ public class TestController : ControllerBase
         {
             return NotFound();
         }
-        
+
         return NoContent();
     }
-    
+
     [HttpGet("my")]
     public async Task<ActionResult<ICollection<UserTest>>> GetUserTestResults()
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var results = await _testService.GetUserTestResultsAsync(userId);
-        
+
         if (results is null)
         {
             return NotFound();
         }
-        
+
         return Ok(results);
     }
 
@@ -177,7 +177,7 @@ public class TestController : ControllerBase
 
         return Ok(results);
     }
-    
+
     [HttpGet("results/{resulId:guid}/preview")]
     public async Task<ActionResult<UserPreviewResultDto>> GetTestPreview([FromRoute] Guid resulId)
     {
@@ -192,7 +192,7 @@ public class TestController : ControllerBase
         {
             return BadRequest("Тест не этого пользователя");
         }
-        
+
         return Ok(result);
     }
 
