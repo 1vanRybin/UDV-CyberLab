@@ -17,10 +17,10 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
-    
+
     [HttpGet("user")]
     [Authorize]
-    public async Task<ActionResult<User>> GetUser()
+    public async Task<ActionResult<UserInfoResponse>> GetUser()
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var result = await _userService.GetUserInfoAsync(userId);
@@ -28,7 +28,7 @@ public class UserController : ControllerBase
         {
             return NotFound("User Not Found");
         }
-        
+
         return Ok(new UserInfoResponse
         {
             UserId = userId,
@@ -37,7 +37,7 @@ public class UserController : ControllerBase
             Role = result.Role
         });
     }
-    
+
     [HttpGet("users/{pageId}")]
     [Authorize(Roles = "Admin")]
     public async Task<ActionResult<List<User>>> GetUsers([FromRoute] int pageId)
