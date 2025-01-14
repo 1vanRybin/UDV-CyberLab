@@ -1,4 +1,6 @@
-﻿using Domain.Entities;
+﻿using AutoMapper;
+using Domain.DTO.Questions;
+using Domain.Entities;
 using Domain.Interfaces;
 using ExampleCore.Dal.Base;
 using Service.interfaces;
@@ -9,11 +11,16 @@ public class QuestionService : IQuestionService
 {
     private readonly IStandartStore _repository;
     private readonly IQuestionStore _questionRepository;
+    private readonly IMapper _mapper;
 
-    public QuestionService(IStandartStore repository, IQuestionStore questionRepository)
+    public QuestionService(
+        IStandartStore repository,
+        IQuestionStore questionRepository,
+        IMapper mapper)
     {
         _repository = repository;
         _questionRepository = questionRepository;
+        _mapper = mapper;   
     }
     
     public async Task<IQuestionBase> GetByIdAsync(Guid questionId)
@@ -61,8 +68,25 @@ public class QuestionService : IQuestionService
         return Guid.Empty;
     }
 
-    public Task<T> UpdateAsync<T>(T question) where T : IQuestionBase
+    public async Task<IQuestionBase> UpdateAsync(QuestionUpdateDto questionDto)
     {
-        throw new NotImplementedException();
+        if (questionDto.ComplianceAnswer is not null)
+        {
+            return await _repository.UpdateAsync(_mapper.Map<QuestionCompliance>(questionDto.ComplianceAnswer));
+        }
+        else if(questionDto.VariantAnswer is not null)
+        {
+            return await _repository.UpdateAsync(_mapper.Map<QuestionVariant>(questionDto.VariantAnswer));
+        }
+        else if (questionDto.FileAnswer is not null)
+        {
+            return await _repository.UpdateAsync(_mapper.Map<QuestionFile>(questionDto.FileAnswer));
+        }
+        else if (questionDto.OpenAnswer is not null)
+        {
+            return await _repository.UpdateAsync(_mapper.Map<QuestionOpen>(questionDto.OpenAnswer));
+        }
+
+        return null;
     }
 }

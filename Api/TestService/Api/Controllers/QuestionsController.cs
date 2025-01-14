@@ -97,17 +97,17 @@ public class QuestionsController : ControllerBase
             _mapper.Map<QuestionVariantDto>(question));
     }
     
-    [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateQuestion([FromRoute] Guid id, [FromBody] QuestionBase? questionDto)
+    [HttpPut]
+    public async Task<IActionResult> UpdateQuestion([FromBody] QuestionUpdateDto? questionDto)
     {
-        if (questionDto is null || id != questionDto.Id)
+        if (questionDto is null)
         {
             return BadRequest();
         }
 
-        var question = _mapper.Map<IQuestionBase>(questionDto);
-        var result = await _questionService.UpdateAsync(question);
-        if (result is not null)
+        var res = _questionService.UpdateAsync(questionDto);
+
+        if (res is null)
         {
             return NotFound();
         }
