@@ -91,4 +91,12 @@ public class TestRepository : ITestStore
             .Include(ut => ut.Test.Questions)
             .FirstOrDefaultAsync(ut => ut.Id == resultId);
     }
+
+    public async Task<List<UserTest?>> GetTestStatistics(Guid testId)
+    {
+        return await _context.UserTests
+            .Include(ut => ut.Test)
+            .Where(ut => ut.TestId == testId)
+            .ToListAsync();
+    }
 }

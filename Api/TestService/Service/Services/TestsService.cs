@@ -203,4 +203,24 @@ public class TestsService: ITestService
         
         return result;
     }
+
+    public async Task<List<StatisticsDto>> GetTestStatistics(Guid testId)
+    {
+        var userTests = await _testStore.GetTestStatistics(testId);
+        var statistics = new List<StatisticsDto>();
+
+        foreach(var test in userTests)
+        {
+            statistics.Add(new StatisticsDto
+            {
+                UserId = test.UserId,
+                TestPoints = test.Test.MaxPoints,
+                Points = test.ScoredPoints,
+                UserTestId = test.Id,
+                TestName = test.Test.Name
+            });
+        }
+
+        return statistics;
+    }
 }

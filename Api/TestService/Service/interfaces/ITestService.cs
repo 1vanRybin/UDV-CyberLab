@@ -25,4 +25,5 @@ public interface ITestService
     Task<List<UserTest?>> GetCompletedAsync(Guid userId);
     Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId);
     Task<UserPreviewResultDto?> GetTestPreviewResult(Guid resultId);
+    Task<List<StatisticsDto>> GetTestStatistics(Guid testId);
 }

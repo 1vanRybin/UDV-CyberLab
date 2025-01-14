@@ -195,4 +195,12 @@ public class TestController : ControllerBase
         
         return Ok(result);
     }
+
+    [HttpGet("statistics/{testId:guid}")]
+    public async Task<IActionResult> GetStatistics([FromRoute] Guid testId)
+    {
+        var result = await _testService.GetTestStatistics(testId);
+
+        return Ok(result);
+    }
 }
