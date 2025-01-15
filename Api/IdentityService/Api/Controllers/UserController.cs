@@ -40,8 +40,15 @@ public class UserController : ControllerBase
 
     [HttpGet("users")]
     [Authorize]
-    public ActionResult<List<User>> GetUsers()
+    public ActionResult<ICollection<UserInfoResponse>> GetUsers()
     {
-        return _userService.GetUsersAsync();
+        var users = _userService.GetUsersAsync();
+        return users.Select(user => new UserInfoResponse
+        {
+            UserId = user.Id,
+            UserName = user.UserName,
+            Email = user.Email,
+            Role = user.Role
+        }).ToList();
     }
 }
