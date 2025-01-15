@@ -26,53 +26,59 @@ namespace Service.Services
                 _userAnswerRepository = userAnswerRepository;
             }
 
-            public async Task<Guid> StartTestAsync(Guid testId, Guid userId)
+        public async Task<Guid> StartTestAsync(Guid testId, Guid userId)
+        {
+            await СheckTestTime(testId);
+            var userTest = await _userTestRepository.GetLatestByUserAndTestAsync(userId, testId);
+            var test = await _testRepository.GetByIdAsync(testId);
+            if (test is null)
             {
-                await СheckTestTime(testId);
-                var userTest = await _userTestRepository.GetLatestByUserAndTestAsync(userId, testId);
-                var test = await _testRepository.GetByIdAsync(testId);
-                if (test is null)
-                {
-                    throw new InvalidOperationException("Тест не найден.");
-                }
-                var leftTime = test.PassTestTime == null ?
-                    DateTime.UtcNow.AddDays(500) :
-                    DateTime.UtcNow.Add(test.PassTestTime.Value);
-
-                if (userTest == null)
-                {
-
-                    var newUserTest = new UserTest
-                    {
-                        Id = Guid.NewGuid(),
-                        TestId = testId,
-                        UserId = userId,
-                        AttemptNumber = 1,
-                        LeftAttemptsCount = test.AttemptsCount - 1,
-                        State = TestState.Running,
-                        LeftTestTime = leftTime
-                    };
-
-                    await _userTestRepository.CreateAsync(newUserTest);
-
-                    return newUserTest.Id;
-                }
-
-                if (userTest.LeftAttemptsCount > 0)
-                {
-                    userTest.LeftAttemptsCount--;
-                    userTest.AttemptNumber++;
-                    userTest.State = TestState.Running;
-                    userTest.LeftTestTime = leftTime;
-                    await _userTestRepository.UpdateAsync(userTest);
-                }
-                else
-                {
-                    throw new InvalidOperationException("Нет доступных попыток для прохождения теста.");
-                }
-
-                return userTest.Id;
+                throw new InvalidOperationException("Тест не найден.");
             }
+            var leftTime = test.PassTestTime == null ?
+                DateTime.UtcNow.AddDays(500) :
+                DateTime.UtcNow.Add(test.PassTestTime.Value);
+
+            if (userTest == null)
+            {
+
+                var newUserTest = new UserTest
+                {
+                    Id = Guid.NewGuid(),
+                    TestId = testId,
+                    UserId = userId,
+                    AttemptNumber = 1,
+                    LeftAttemptsCount = test.AttemptsCount - 1,
+                    State = TestState.Running,
+                    LeftTestTime = leftTime
+                };
+
+                await _userTestRepository.CreateAsync(newUserTest);
+
+                return newUserTest.Id;
+            }
+
+            if (userTest.LeftAttemptsCount > 0)
+            {
+                var newUserTest = new UserTest
+                {
+                    Id = Guid.NewGuid(),
+                    TestId = testId,
+                    UserId = userId,
+                    AttemptNumber = userTest.AttemptNumber+1,
+                    LeftAttemptsCount = userTest.LeftAttemptsCount-1,
+                    State = TestState.Running,
+                    LeftTestTime = leftTime
+                };
+                await _userTestRepository.CreateAsync(newUserTest);
+
+                return newUserTest.Id;
+            }
+            else
+            {
+                throw new InvalidOperationException("Нет доступных попыток для прохождения теста.");
+            }
+        }
 
             public async Task SaveAnswersAsync(Guid testId, Guid userId, UserAnswersDto userPreviewResultDto)
             {

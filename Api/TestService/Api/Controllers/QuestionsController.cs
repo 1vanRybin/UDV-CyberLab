@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Service.interfaces;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Api.Controllers;
 
@@ -43,7 +44,18 @@ public class QuestionsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateComplianceQuestion([FromBody] QuestionComplianceDto questionDto)
     {
-        var question = _mapper.Map<QuestionCompliance>(questionDto);
+        var question = new QuestionCompliance
+        {
+            Text = questionDto.Text,
+            Description = questionDto.Description,
+            Points = questionDto.Points,
+            SortOrder = questionDto.SortOrder,
+            TestId = questionDto.TestId,
+            Compliances= questionDto.Compliances,
+            RightCompliances = questionDto.RightCompliances,
+            Variants = questionDto.Variants
+        };
+
         var questionId = await _questionService.CreateAsync(question);
         if (questionId == Guid.Empty)
         {
