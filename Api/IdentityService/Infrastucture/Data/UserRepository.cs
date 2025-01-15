@@ -99,5 +99,10 @@ public class UserRepository: IUserStore
         return user;
     }
 
-   
+    public List<User> GetAllAsync()
+    {
+        var users = _dbContext.Users.ToList();
+        return users;
+    }
+
 }

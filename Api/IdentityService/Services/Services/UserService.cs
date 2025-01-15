@@ -10,7 +10,6 @@ namespace Services.Services
     public class UserService : IUserService
     {
         private readonly IUserStore _userStore;
-
         public UserService(IUserStore userStore)
         {
             _userStore = userStore;
@@ -36,9 +35,9 @@ namespace Services.Services
             return user;
         }
 
-        public async Task<List<User>> GetUsersAsync(int page)
+        public List<User> GetUsersAsync()
         {
-            var paginatedUsers = await _userStore.GetByPageAsync(page);
+            var paginatedUsers = _userStore.GetAllAsync();
             return paginatedUsers;
         }
 

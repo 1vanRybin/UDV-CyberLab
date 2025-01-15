@@ -38,10 +38,10 @@ public class UserController : ControllerBase
         });
     }
 
-    [HttpGet("users/{pageId}")]
-    [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<List<User>>> GetUsers([FromRoute] int pageId)
+    [HttpGet("users")]
+    [Authorize]
+    public ActionResult<List<User>> GetUsers()
     {
-        return await _userService.GetUsersAsync(pageId);
+        return _userService.GetUsersAsync();
     }
 }
