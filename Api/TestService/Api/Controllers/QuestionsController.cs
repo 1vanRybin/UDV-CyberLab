@@ -38,7 +38,7 @@ public class QuestionsController : ControllerBase
 
         return Ok(question);
     }
-    
+
     [HttpPost("compliance")]
     [ProducesResponseType(typeof(QuestionComplianceDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -61,8 +61,8 @@ public class QuestionsController : ControllerBase
         {
             return NotFound("Test Was Not Found");
         }
-        
-        
+
+
         return Created(
             $"/api/Questions/{questionId}",
             _mapper.Map<QuestionComplianceDto>(question));
@@ -101,14 +101,14 @@ public class QuestionsController : ControllerBase
     {
         var question = _mapper.Map<QuestionVariant>(questionDto);
         var questionId = await _questionService.CreateAsync(question);
-        
-        
-        
+
+
+
         return Created(
             $"/api/Questions/{questionId}",
             _mapper.Map<QuestionVariantDto>(question));
     }
-    
+
     [HttpPut]
     public async Task<IActionResult> UpdateQuestion([FromBody] QuestionUpdateDto? questionDto)
     {
@@ -117,7 +117,7 @@ public class QuestionsController : ControllerBase
             return BadRequest();
         }
 
-        var res = _questionService.UpdateAsync(questionDto);
+        var res = await _questionService.UpdateAsync(questionDto);
 
         if (res is null)
         {
@@ -126,7 +126,7 @@ public class QuestionsController : ControllerBase
 
         return NoContent();
     }
-    
+
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteQuestion([FromRoute] Guid id)
     {

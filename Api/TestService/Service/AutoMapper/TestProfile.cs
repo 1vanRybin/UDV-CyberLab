@@ -12,8 +12,10 @@ namespace Service.AutoMapper
                 .ForMember(dest => dest.Questions, opt => opt.Ignore()) // Исключаем Questions из маппинга
                 .ReverseMap()
                 .ForMember(dest => dest.Questions, opt => opt.Ignore());
-            
-            CreateMap<UserTest, UserTestResultDto>().ReverseMap();
+
+            CreateMap<UserTest, UserTestResultDto>()
+                .ForMember(dest => dest.MaxPoints, opt
+                    => opt.MapFrom(src => src.Test != null ? (float?)src.Test.MaxPoints : null)).ReverseMap();
 
             CreateMap<UserTest, ShortTestDto>()
            .ForMember(dest => dest.TestId, opt => opt.MapFrom(src => src.TestId))

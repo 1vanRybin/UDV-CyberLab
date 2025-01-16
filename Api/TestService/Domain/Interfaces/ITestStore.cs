@@ -5,9 +5,10 @@ namespace Domain.Interfaces;
 public interface ITestStore
 {
     Task<Test?> GetByIdAsync(Guid testId);
-    Task<UserTest?> GetByIdShortAsync(Guid testId);
+    Task<UserTest?> GetByIdAndUserIdShortAsync(Guid testId, Guid userId);
+    Task<UserTest?> GetBestScore(Guid testId, Guid userId);
     Task<ICollection<UserTest?>> GetUserTestResultsAsync(Guid guid);
-
+    Task<ICollection<UserTest?>> GetLastUserTests(Guid userId);
     Task<ICollection<QuestionBase>> GetAllQuestionsByTestIdAsync(Guid testId);
     Task<List<Test?>> GetAllAsync();
     Task<List<Test?>> GetAllUserTestsAsync(Guid userId);

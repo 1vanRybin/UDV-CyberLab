@@ -61,9 +61,9 @@ public class TestsService: ITestService
         return userTest;
     }
 
-    public async Task<ShortTestDto> GetByIdShortAsync(Guid id)
+    public async Task<ShortTestDto> GetByIdShortAsync(Guid id, Guid  userId)
     {
-        var testEntity = await _testStore.GetByIdShortAsync(id);
+        var testEntity = await _testStore.GetByIdAndUserIdShortAsync(id, userId);
         if (testEntity is null)
         {
             var test = await _testStore.GetByIdAsync(id);
@@ -92,6 +92,13 @@ public class TestsService: ITestService
             };
         }
 
+        if (testEntity.AttemptNumber < 0)
+        {
+            testEntity.AttemptNumber = 0;
+        }
+
+        var bestScore = await _testStore.GetBestScore(id, userId);
+        testEntity.ScoredPoints = bestScore.ScoredPoints;
         var testDto = _mapper.Map<ShortTestDto>(testEntity);
         return testDto;
     }
@@ -140,7 +147,13 @@ public class TestsService: ITestService
 
     public async Task<ICollection<UserTestResultDto>?> GetUserTestResultsAsync(Guid userId)
     {
-        var testResults = await _testStore.GetUserTestResultsAsync(userId);
+        var testResults = await _testStore.GetLastUserTests(userId);
+
+        foreach (var lastTest in testResults)
+        {
+            var bestScore = await _testStore.GetBestScore(lastTest.TestId, userId);
+            lastTest.ScoredPoints = bestScore.ScoredPoints;
+        }
 
         var testDto = _mapper.Map<ICollection<UserTestResultDto>>(testResults);
 
@@ -174,9 +187,13 @@ public class TestsService: ITestService
         return await _testStore.GetAllUserTestsAsync(userId);
     }
 
-    public async Task<List<UserTest?>> GetCompletedAsync(Guid userId)
+    public async Task<ICollection<UserTestResultDto?>> GetCompletedAsync(Guid userId)
     {
-        return await _testStore.GetCompletedAsync(userId);
+        var tests = await _testStore.GetCompletedAsync(userId);
+
+        var testDto = _mapper.Map<ICollection<UserTestResultDto>>(tests);
+
+        return testDto;
     }
 
     public async Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId)
@@ -192,13 +209,22 @@ public class TestsService: ITestService
             return null;
         }
 
+        var test = await _testStore.GetByIdAsync(userTest.TestId);
+        if (test is null)
+        {
+            return null;
+        }
+
         var userAnswer = await _userAnswerRepository.GetAllByUserTestIdAsync(resultId);
         var result = new UserPreviewResultDto
         {
             UserId = userTest.UserId,
+            CurrentPoints = userTest.ScoredPoints,
+            MaxPoints = test.MaxPoints,
             Questions = userAnswer.Select(answer => new QuestionResultDto
             {
-                QuestionText = answer. QuestionText,
+
+                QuestionText = answer.QuestionText,
                 QuestionId = answer.QuestionId,
                 UserAnswerText = answer.AnswerText,
                 CorrectAnswerText = answer.CorrectText,

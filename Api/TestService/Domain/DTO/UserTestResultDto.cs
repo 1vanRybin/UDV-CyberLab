@@ -14,6 +14,7 @@ public class UserTestResultDto
     public int AttemptNumber { get; set; }
     public int LeftAttemptsCount { get; set; }
     public float ScoredPoints { get; set; }
+    public float MaxPoints { get; set; }
     public DateTime LeftTestTime { get; set; }
     public bool IsChecked { get; set; }
 }

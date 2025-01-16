@@ -396,7 +396,7 @@ namespace Service.Services
             if (test == null || test.Questions == null || !test.Questions.Any())
                 return 0;
 
-            var userTest = await _userTestRepository.GetByUserAndTestAsync(userId, testId);
+            var userTest = await _userTestRepository.GetLatestByUserAndTestAsync(userId, testId);
             if (userTest == null)
                 return 0;
 

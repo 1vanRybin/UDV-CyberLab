@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Infrastructure.Data;
 
@@ -22,12 +23,25 @@ public class TestRepository : ITestStore
             .FirstOrDefaultAsync(t => t.Id == testId);
     }
 
-    public async Task<UserTest?> GetByIdShortAsync(Guid testId)
+    public async Task<UserTest?> GetByIdAndUserIdShortAsync(Guid testId, Guid userId)
     {
         var testDbSet = _context.UserTests.Include(ut => ut.Test);
 
         return await testDbSet
-            .FirstOrDefaultAsync(t => t.TestId == testId);
+            .Where(t => t.TestId == testId && t.UserId == userId)
+            .OrderByDescending(t => t.AttemptNumber)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<UserTest?> GetBestScore(Guid testId, Guid userId)
+    {
+        var testDbSet = _context.UserTests
+            .Include(ut => ut.Test);
+
+        return await testDbSet
+            .Where(t => t.TestId == testId && t.UserId == userId)
+            .OrderByDescending(t => t.ScoredPoints)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<ICollection<UserTest?>> GetUserTestResultsAsync(Guid userId)
@@ -40,6 +54,22 @@ public class TestRepository : ITestStore
 
         return result;
     }
+    public async Task<ICollection<UserTest?>> GetLastUserTests(Guid userId)
+    {
+        var userTestDbSet = _context.UserTests
+            .Include(ut => ut.Test);
+
+        var lastAttempts = await userTestDbSet
+            .Where(ut => ut.UserId == userId)
+            .GroupBy(ut => ut.TestId)
+            .Select(g => g
+                    .OrderByDescending(ut => ut.AttemptNumber)
+                    .FirstOrDefault()
+            )
+            .ToListAsync();
+
+        return lastAttempts;
+    }
 
     public async Task<ICollection<QuestionBase>> GetAllQuestionsByTestIdAsync(Guid testId)
     {
@@ -49,7 +79,7 @@ public class TestRepository : ITestStore
             .SelectMany(t => t.Questions)
             .ToListAsync();
     }
-    
+
     public async Task<List<Test?>> GetAllAsync()
     {
         return await _context.Tests
@@ -66,11 +96,19 @@ public class TestRepository : ITestStore
 
     public async Task<List<UserTest?>> GetCompletedAsync(Guid userId)
     {
-        return await _context.UserTests
-            .Where(ut => 
-                ut.UserId == userId && 
+        var userTestDbSet = _context.UserTests.Include(ut => ut.Test);
+
+        var lastCompletedTests = await userTestDbSet
+            .Where(ut =>
+                ut.UserId == userId &&
                 ut.State == TestState.Completed)
+            .GroupBy(ut => ut.TestId)
+            .Select(g => g
+                .OrderByDescending(ut => ut.AttemptNumber)
+                .FirstOrDefault())
             .ToListAsync();
+
+        return lastCompletedTests;
     }
 
     public async Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId)

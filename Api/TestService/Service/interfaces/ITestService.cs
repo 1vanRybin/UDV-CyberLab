@@ -10,7 +10,7 @@ public interface ITestService
     Task<IEnumerable<TestDto>> GetAsync();
 
     Task<TestDto> GetByIdAsync(Guid id);
-    Task<ShortTestDto> GetByIdShortAsync(Guid id);
+    Task<ShortTestDto> GetByIdShortAsync(Guid id, Guid userId);
     Task<UserTest> GetUserTestByIdAsync(Guid userTestId);
 
     Task<Guid> CreateAsync(Test test);
@@ -22,7 +22,7 @@ public interface ITestService
     Task<ICollection<UserTestResultDto>?> GetUserTestResultsAsync(Guid userId);
     Task<ICollection<object>> GetAllQuestionsByTestIdAsync(Guid testId);
     Task<List<Test?>> GetAllUserTestsAsync(Guid userId);
-    Task<List<UserTest?>> GetCompletedAsync(Guid userId);
+    Task<ICollection<UserTestResultDto?>> GetCompletedAsync(Guid userId);
     Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId);
     Task<UserPreviewResultDto?> GetTestPreviewResult(Guid resultId);
     Task<List<StatisticsDto>> GetTestStatistics(Guid testId);

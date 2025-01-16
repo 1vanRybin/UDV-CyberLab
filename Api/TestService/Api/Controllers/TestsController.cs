@@ -65,7 +65,8 @@ public class TestController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ShortTestDto>> GetShortTest(Guid id)
     {
-        var test = await _testService.GetByIdShortAsync(id);
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var test = await _testService.GetByIdShortAsync(id, userId);
 
         if (test == null)
         {
@@ -140,7 +141,7 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("my")]
-    public async Task<ActionResult<ICollection<UserTest>>> GetUserTestResults()
+    public async Task<ActionResult<ICollection<UserTestResultDto>>> GetUserTestResults()
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var results = await _testService.GetUserTestResultsAsync(userId);
@@ -154,7 +155,7 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("created")]
-    public async Task<ActionResult<ICollection<UserTest>>> GetUserTests()
+    public async Task<ActionResult<ICollection<Test>>> GetUserTests()
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var results = await _testService.GetAllUserTestsAsync(userId);
@@ -168,7 +169,7 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("passed")]
-    public async Task<ActionResult<ICollection<UserTest>>> GetCompletedTests()
+    public async Task<ActionResult<ICollection<UserTestResultDto>>> GetCompletedTests()
     {
         var userId = UserHelper.GetUserId(HttpContext.Request);
         var results = await _testService.GetCompletedAsync(userId);
