@@ -46,6 +46,7 @@ namespace Service.Services
                 {
                     Id = Guid.NewGuid(),
                     TestId = testId,
+                    TestName = test.Name,
                     UserId = userId,
                     AttemptNumber = 1,
                     LeftAttemptsCount = test.AttemptsCount - 1,
@@ -64,6 +65,7 @@ namespace Service.Services
                 {
                     Id = Guid.NewGuid(),
                     TestId = testId,
+                    TestName = test.Name,
                     UserId = userId,
                     AttemptNumber = userTest.AttemptNumber+1,
                     LeftAttemptsCount = userTest.LeftAttemptsCount-1,

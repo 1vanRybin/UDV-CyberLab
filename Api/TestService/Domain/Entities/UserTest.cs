@@ -7,6 +7,7 @@ namespace Domain.Entities
         public Guid TestId { get; set; }
         public Guid UserId { get; set; }
 
+        public string TestName { get; set; }
         public TestState State { get; set; }
         public int AttemptNumber { get; set; }
         public int LeftAttemptsCount { get; set; }
