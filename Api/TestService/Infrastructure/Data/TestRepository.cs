@@ -104,7 +104,7 @@ public class TestRepository : ITestStore
                 ut.State == TestState.Completed)
             .GroupBy(ut => ut.TestId)
             .Select(g => g
-                .OrderByDescending(ut => ut.AttemptNumber)
+                .OrderByDescending(ut => ut.ScoredPoints)
                 .FirstOrDefault())
             .ToListAsync();
 
