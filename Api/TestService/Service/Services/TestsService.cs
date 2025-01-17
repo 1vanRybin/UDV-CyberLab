@@ -219,7 +219,7 @@ public class TestsService: ITestService
                 ScoredPoints = IsCorrect(userAnswers.Where(ua => ua.UserTestId == resultId && ua.QuestionId == q.Id).FirstOrDefault()) ? q.Points : 0
             })
             .ToList(),
-            TestName = userTest.Test.Name,  
+            TestName = userTest.Test.Name,
             MaxPoints = userTest.Test.MaxPoints,
             ScoredPoints = userTest.ScoredPoints
         };
@@ -267,8 +267,13 @@ public class TestsService: ITestService
         return result;
     }
 
-    private static bool IsCorrect(UserAnswer answer)
+    private static bool IsCorrect(UserAnswer? answer)
     {
+        if (answer is null)
+        {
+            return false;
+        }
+
         return (answer.AnswerText == answer.CorrectText)
                                     && ((answer.VariantChoices == null && answer.CorrectChoices == null) ||
                                         (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices)))
