@@ -13,6 +13,12 @@ public class UserAnswerRepository : IUserAnswerRepository
         _context = context;
     }
 
+    public async Task<UserAnswer?> GetByUserTestAndQuestionAsync(Guid userTestId, Guid questionId)
+    {
+        return await _context.Set<UserAnswer>()
+           .Where(a => a.UserTestId == userTestId && a.QuestionId == questionId)
+           .FirstOrDefaultAsync();
+    }
     public async Task<List<UserAnswer>> GetAllByUserTestIdAsync(Guid userTestId)
     {
         return await _context.Set<UserAnswer>()

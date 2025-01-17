@@ -214,6 +214,19 @@ public class TestController : ControllerBase
         return Ok(result);
     }
 
+    [HttpGet("results/{attemptId:guid}")]
+    public async Task<ActionResult<UserTestShortDto>> GetTestResult([FromRoute] Guid attemptId)
+    {
+        var userId = UserHelper.GetUserId(HttpContext.Request);
+        var result = await _testService.GetUserTestResultAsync(attemptId);
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
     [HttpGet("statistics/{testId:guid}")]
     public async Task<IActionResult> GetStatistics([FromRoute] Guid testId)
     {

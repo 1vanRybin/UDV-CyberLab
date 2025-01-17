@@ -7,5 +7,6 @@ namespace Domain.Interfaces
     {
         Task<Guid> CreateOrUpdateAsync(UserAnswer answer);
         Task<List<UserAnswer>> GetAllByUserTestIdAsync(Guid userTestId);
+        Task<UserAnswer?> GetByUserTestAndQuestionAsync(Guid userTestId, Guid questionId);
     }
 }

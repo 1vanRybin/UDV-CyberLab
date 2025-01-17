@@ -135,6 +135,10 @@ public class TestRepository : ITestStore
         return await _context.UserTests
             .Include(ut => ut.Test)
             .Where(ut => ut.TestId == testId)
+            .GroupBy(ut => ut.TestId)
+            .Select(g => g
+                .OrderByDescending(ut => ut.ScoredPoints)
+                .FirstOrDefault())
             .ToListAsync();
     }
 }

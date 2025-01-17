@@ -201,6 +201,32 @@ public class TestsService: ITestService
         return await _testStore.GetTestResultsAsync(userId, testId);
     }
 
+    public async Task<UserTestShortDto> GetUserTestResultAsync(Guid resultId)
+    {
+        var userTest = await _testStore.GetUserTest(resultId);
+        var userAnswers = await _userAnswerRepository.GetAllByUserTestIdAsync(resultId);
+
+        var result = new UserTestShortDto
+        {
+            Id = resultId,
+            AttemptNumber = userTest.AttemptNumber,
+            Questions = userTest.Test.Questions
+            .Select(q =>
+            new QuestionInfoDto
+            {
+                Id = q.Id,
+                MaxPoints = q.Points,
+                ScoredPoints = IsCorrect(userAnswers.Where(ua => ua.UserTestId == resultId && ua.QuestionId == q.Id).FirstOrDefault()) ? q.Points : 0
+            })
+            .ToList(),
+            TestName = userTest.Test.Name,  
+            MaxPoints = userTest.Test.MaxPoints,
+            ScoredPoints = userTest.ScoredPoints
+        };
+
+        return result;
+    }
+
     public async Task<UserPreviewResultDto?> GetTestPreviewResult(Guid resultId)
     {
         var userTest = await _testStore.GetUserTest(resultId);
@@ -233,17 +259,22 @@ public class TestsService: ITestService
                 UserCompliances = answer.ComplianceData,
                 CorrectCompliances = answer.CorrectData,
                 HasUserFile = !string.IsNullOrEmpty(answer.FileContent),
-                IsCorrect = (answer.AnswerText == answer.CorrectText)
-                            && ((answer.VariantChoices == null && answer.CorrectChoices == null) ||
-                                (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices)))
-                            && ((answer.ComplianceData == null && answer.CorrectData == null) ||
-                                (answer.ComplianceData != null && answer.CorrectData != null
-                                                               && answer.ComplianceData.OrderBy(kv => kv.Key).SequenceEqual(answer.CorrectData.OrderBy(kv => kv.Key))))
+                IsCorrect = IsCorrect(answer)
             }).ToList()
         };
 
 
         return result;
+    }
+
+    private static bool IsCorrect(UserAnswer answer)
+    {
+        return (answer.AnswerText == answer.CorrectText)
+                                    && ((answer.VariantChoices == null && answer.CorrectChoices == null) ||
+                                        (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices)))
+                                    && ((answer.ComplianceData == null && answer.CorrectData == null) ||
+                                        (answer.ComplianceData != null && answer.CorrectData != null
+                                                                       && answer.ComplianceData.OrderBy(kv => kv.Key).SequenceEqual(answer.CorrectData.OrderBy(kv => kv.Key))));
     }
 
     public async Task<List<StatisticsDto>> GetTestStatistics(Guid testId)
