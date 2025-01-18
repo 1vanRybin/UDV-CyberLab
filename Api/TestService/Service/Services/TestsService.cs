@@ -201,7 +201,7 @@ public class TestsService: ITestService
         return await _testStore.GetTestResultsAsync(userId, testId);
     }
 
-    public async Task<UserTestShortDto> GetUserTestResultAsync(Guid resultId)
+    public async Task<UserTestShortDto> GetUserTestResultAsync (Guid resultId)
     {
         var userTest = await _testStore.GetUserTest(resultId);
         var userAnswers = await _userAnswerRepository.GetAllByUserTestIdAsync(resultId);
@@ -276,7 +276,7 @@ public class TestsService: ITestService
 
         return (answer.AnswerText == answer.CorrectText)
                                     && ((answer.VariantChoices == null && answer.CorrectChoices == null) ||
-                                        (answer.VariantChoices != null && answer.VariantChoices.SequenceEqual(answer.CorrectChoices)))
+                                        (answer.VariantChoices != null && new HashSet<int>(answer.VariantChoices).SetEquals(new HashSet<int>(answer.CorrectChoices))))
                                     && ((answer.ComplianceData == null && answer.CorrectData == null) ||
                                         (answer.ComplianceData != null && answer.CorrectData != null
                                                                        && answer.ComplianceData.OrderBy(kv => kv.Key).SequenceEqual(answer.CorrectData.OrderBy(kv => kv.Key))));
