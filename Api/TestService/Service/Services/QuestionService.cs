@@ -45,7 +45,7 @@ public class QuestionService : IQuestionService
             return Guid.Empty;
         }
         test.MaxPoints += question.Points;
-        await _repository.UpdateAsync(test);  
+        await _repository.UpdateAsync(test);
 
         var result = await _repository.CreateAsync(question);
 
@@ -78,24 +78,46 @@ public class QuestionService : IQuestionService
     {
         if (questionDto.ComplianceAnswer is not null)
         {
+            await UpdatePoints(questionDto.ComplianceAnswer);
             return await _repository.UpdateAsync(_mapper.Map<QuestionCompliance>(questionDto.ComplianceAnswer));
         }
 
         if(questionDto.VariantAnswer is not null)
         {
+            await UpdatePoints(questionDto.VariantAnswer);
             return await _repository.UpdateAsync(_mapper.Map<QuestionVariant>(questionDto.VariantAnswer));
         }
 
         if (questionDto.FileAnswer is not null)
         {
+            await UpdatePoints(questionDto.FileAnswer);
             return await _repository.UpdateAsync(_mapper.Map<QuestionFile>(questionDto.FileAnswer));
         }
 
         if (questionDto.OpenAnswer is not null)
         {
+            await UpdatePoints(questionDto.OpenAnswer);
             return await _repository.UpdateAsync(_mapper.Map<QuestionOpen>(questionDto.OpenAnswer));
         }
 
         return null;
+    }
+
+    public async Task UpdatePoints(QuestionBaseDto questionBase)
+    {
+        var test = await _repository.GetByIdAsync<Test>(questionBase.TestId);
+        if (test is null)
+        {
+            return;
+        }
+
+        var question = await _questionRepository.GetByIdAsync(questionBase.Id);
+        if (question is null)
+        {
+            return;
+        }
+
+        test.MaxPoints = test.MaxPoints - question.Points + questionBase.Points;
+        await _repository.UpdateAsync(test);
     }
 }
