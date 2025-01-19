@@ -44,6 +44,8 @@ public class QuestionService : IQuestionService
         {
             return Guid.Empty;
         }
+        test.MaxPoints += question.Points;
+        await _repository.UpdateAsync(test);  
 
         var result = await _repository.CreateAsync(question);
 
@@ -62,6 +64,10 @@ public class QuestionService : IQuestionService
         var result = await _repository.DeleteAsync(target);
         if (result)
         {
+            var test = await _repository.GetByIdAsync<Test>(target.TestId);
+            test.MaxPoints -= target.Points;
+            await _repository.UpdateAsync(test);
+
             return questionId;
         }
 
