@@ -206,10 +206,6 @@ public class TestController : ControllerBase
             return NotFound();
         }
 
-        if (result.UserId != userId)
-        {
-            return BadRequest("Тест не этого пользователя");
-        }
 
         return Ok(result);
     }
