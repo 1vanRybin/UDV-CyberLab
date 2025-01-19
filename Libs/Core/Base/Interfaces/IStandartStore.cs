@@ -4,7 +4,7 @@ namespace Domain.Interfaces;
 
 public interface IStandartStore
 {
-    Task<T?> GetByIdAsync<T>(Guid id) where T : BaseEntity<Guid>;
+    Task<T?> GetByIdAsync<T>(Guid id, bool asNoTracking = false) where T : BaseEntity<Guid>;
     Task<Guid> CreateAsync<T>(T entity) where T : BaseEntity<Guid>;
     Task<Guid> CreateAsync<T>(Guid id, T entity) where T : BaseEntity<Guid>;
     Task<T> UpdateAsync<T>(T entity) where T : BaseEntity<Guid>;

@@ -13,11 +13,18 @@ public class BaseRepository: IStandartStore
         _applicationDbContext = applicationDbContext;
     }
 
-    public async Task<T?> GetByIdAsync<T>(Guid id)
+    public async Task<T?> GetByIdAsync<T>(Guid id, bool asNoTracking = false)
         where T : BaseEntity<Guid>
     {
-        var res = await _applicationDbContext.Set<T>().FindAsync(id);
-        
+        IQueryable<T>  query = _applicationDbContext.Set<T>();
+
+        if (asNoTracking)
+        {
+            query = query.AsNoTracking();
+        }
+
+        var res = await query.FirstOrDefaultAsync(e => e.Id == id);
+
         return res;
     }
 
@@ -28,17 +35,17 @@ public class BaseRepository: IStandartStore
         entity.Id = entityId;
         await _applicationDbContext.Set<T>().AddAsync(entity);
         await _applicationDbContext.SaveChangesAsync();
-        
+
         return entityId;
     }
-    
+
     public async Task<Guid> CreateAsync<T>(Guid id, T entity)
         where T : BaseEntity<Guid>
     {
         entity.Id = id;
         await _applicationDbContext.Set<T>().AddAsync(entity);
         await _applicationDbContext.SaveChangesAsync();
-        
+
         return id;
     }
     public async Task<T> UpdateAsync<T>(T entity)
@@ -50,7 +57,7 @@ public class BaseRepository: IStandartStore
 
         return entity;
     }
-    
+
 
     public async Task<bool> DeleteAsync<T>(T entity)
         where T : BaseEntity<Guid>
@@ -69,7 +76,7 @@ public class BaseRepository: IStandartStore
 
         return res;
     }
-    
+
     public async Task<List<T>> GetPaginatedAsync<T>(int page, int pageSize)
         where T : BaseEntity<Guid>
     {
@@ -77,7 +84,7 @@ public class BaseRepository: IStandartStore
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-        
+
         return paginatedList;
     }
 }
