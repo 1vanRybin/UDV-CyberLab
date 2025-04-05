@@ -37,10 +37,15 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: identityNEOLab
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
     networks:
       - database
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "user" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -51,16 +56,73 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: testsNEOLab
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
     networks:
       - database
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "user" ]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  prometheus:
+    image: prom/prometheus:latest
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - database
+    depends_on:
+      - db
+      - tests-db
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+      - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    networks:
+      - database
+    depends_on:
+      - prometheus
+
+
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:123@db:5432/identityNEOLab?sslmode=disable"
+    ports:
+      - "9187:9187"
+    networks:
+      - database
+    depends_on:
+      - db
+
+  tests-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:123@tests-db:5432/testsNEOLab?sslmode=disable"
+    ports:
+      - "9188:9187"
+    networks:
+      - database
+    depends_on:
+      - tests-db
+
 volumes:
   postgres_data:
+  grafana-storage:
 
 networks:
   database:
