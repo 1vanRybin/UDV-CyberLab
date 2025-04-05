@@ -9,9 +9,9 @@ namespace Api.Controllers;
 public class ProjectCardController(IProjectService _projectService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> CreateProjectCard([FromBody] ProjectCardDTO request)
+    public async Task<IActionResult> CreateProjectCard([FromForm] ProjectCardDTO request)
     {
-        var guid = await _projectService.CreateAsync(request, request.LogoPhoto, request.PhotoPath,
+        var guid = await _projectService.CreateAsync(request, request.LogoPhoto, request.ProjectPhoto,
             request.Documentation);
 
         return Ok(guid);

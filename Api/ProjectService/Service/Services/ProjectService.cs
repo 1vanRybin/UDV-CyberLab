@@ -23,7 +23,7 @@ public class ProjectService(
         card.Id = Guid.NewGuid();
 
         var projectDirectory = Path.Combine(
-            Directory.GetCurrentDirectory(),
+            Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName,
             "uploads",
             "projects",
             card.Id.ToString());

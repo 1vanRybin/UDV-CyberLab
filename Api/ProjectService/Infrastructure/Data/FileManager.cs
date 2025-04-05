@@ -10,8 +10,8 @@ public class FileManager : IFileManager
         if (file is null) return "";
 
         Directory.CreateDirectory(projectDirectory);
-
-        var filePath = Path.Combine(projectDirectory, fileName);
+        var extention = Path.GetExtension(file.FileName);
+        var filePath = Path.Combine(projectDirectory, $"{fileName}{extention}");
 
         await using var fileStream = new FileStream(filePath, FileMode.Create);
 
