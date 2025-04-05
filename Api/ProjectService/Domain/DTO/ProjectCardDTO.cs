@@ -1,4 +1,5 @@
-﻿
+﻿using Microsoft.AspNetCore.Http;
+
 namespace Domain.DTO
 {
     public class ProjectCardDTO
@@ -7,11 +8,9 @@ namespace Domain.DTO
         public required string Description { get; set; }
         public string? ShortDescription { get; set; }
         public required string OwnerName { get; set; }
-        public required double Rating { get; set; }
-        public required string LogoPath { get; set; }
-        public string? PhotoPath { get; set; }
+        public required IFormFile LogoPhoto { get; set; }
+        public IFormFile? PhotoPath { get; set; }
         public required string LandingURL { get; set; }
-        public required string DocumentationPath { get; set; }
-        public int ViewsCount { get; set; }
+        public required IFormFile Documentation { get; set; }
     }
 }
