@@ -31,6 +31,21 @@ services:
       - database
     restart: always
 
+  projects:
+    build:
+      context: .
+      dockerfile: Api/ProjectService/Api/Dockerfile
+    ports:
+      - "5108:5108"
+    depends_on:
+      tests-db:
+        condition: service_healthy
+    environment:
+      - ConnectionStrings__DefaultConnection=User ID=postgres;Password=123;Host=projects-db;Port=5432;Database=projectsNEOLab;Pooling=true;
+    networks:
+      - database
+    restart: always
+
   db:
     image: postgres:latest
     environment:
@@ -56,6 +71,25 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: testsNEOLab
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
+    networks:
+      - database
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  projects-db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: projectsNEOLab
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     command: >
