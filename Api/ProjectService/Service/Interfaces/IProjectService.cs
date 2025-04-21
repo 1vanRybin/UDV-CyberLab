@@ -9,4 +9,8 @@ public interface IProjectService
         IFormFile logo,
         IFormFile? photo,
         IFormFile documentation);
+    Task<ProjectPageDto> GetByIdAsync(Guid id);
+    Task<ProjectCardFilesResponse> GetProjectFilesAsync(Guid projectId);
+    Task<(byte[] Data, string MimeType)> GetProjectFileAsync(string path);
+    Task<ShortCardDto[]> GetAllShortCards();
 }

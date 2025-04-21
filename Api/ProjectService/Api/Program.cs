@@ -1,3 +1,4 @@
+using Api.Middlewares;
 using ExampleCore.Swagger;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -44,5 +45,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 app.Run();

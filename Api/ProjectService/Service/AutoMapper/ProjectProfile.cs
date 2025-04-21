@@ -9,6 +9,8 @@ namespace Service.AutoMapper
         public ProjectProfile()
         {
             CreateMap<ProjectCard, ProjectCardDTO>().ReverseMap();
+            CreateMap<ProjectCard, ProjectPageDto>().ReverseMap();
+            CreateMap<ProjectCard, ShortCardDto>().ReverseMap();
         } 
     }
 }
