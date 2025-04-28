@@ -15,24 +15,18 @@ public class ProjectService(
     : IProjectService
 {
     public async Task<Guid> CreateAsync(ProjectCardDTO cardDto,
-        IFormFile logo,
-        IFormFile? photo,
-        IFormFile documentation)
+    IFormFile logo,
+    IFormFile? photo,
+    IFormFile documentation)
     {
         var card = _mapper.Map<ProjectCard>(cardDto);
-
         card.Id = Guid.NewGuid();
 
-        var projectDirectory = Path.Combine(
-            Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName,
-            "uploads",
-            "projects",
-            card.Id.ToString());
+        var projectDirectory = $"uploads/{card.Id}";
 
         card.LogoPath = await _fileManager.CreateAsync(logo, projectDirectory, $"logo_{card.Name}");
         card.PhotoPath = await _fileManager.CreateAsync(photo, projectDirectory, $"photo_{card.Name}");
-        card.DocumentationPath =
-            await _fileManager.CreateAsync(documentation, projectDirectory, $"documentation_{card.Name}");
+        card.DocumentationPath = await _fileManager.CreateAsync(documentation, projectDirectory, $"documentation_{card.Name}");
 
         var cardId = await _projectRepository.CreateAsync(card.Id, card);
 

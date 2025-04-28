@@ -1,4 +1,6 @@
-﻿using Domain.Interfaces;
+﻿using Amazon.Runtime;
+using Amazon.S3;
+using Domain.Interfaces;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +13,6 @@ public static class InfrastuctureStartup
     public static IServiceCollection TryAddInfrastucture(this IServiceCollection serviceCollection, IConfigurationManager configurationManager)
     {        var connectionString = configurationManager.GetConnectionString("DefaultConnection");
 
-        serviceCollection.TryAddScoped<IFileManager, FileManager>();
         serviceCollection.TryAddScoped<IProjectRepository, ProjectRepository>();
 
         serviceCollection.AddDbContext<ProjectsDbContext>(options =>
@@ -20,6 +21,20 @@ public static class InfrastuctureStartup
         });
 
         serviceCollection.AddScoped<DbContext>(provider => provider.GetService<ProjectsDbContext>());
+
+        var awsOptions = new AmazonS3Config
+        {
+            ServiceURL = configurationManager["YandexStorage:ServiceUrl"]
+        };
+
+        serviceCollection.AddSingleton<IAmazonS3>(sp =>
+            new AmazonS3Client(
+                new BasicAWSCredentials(
+                    configurationManager["YandexStorage:AccessKey"],
+                    configurationManager["YandexStorage:SecretKey"]),
+                awsOptions));
+
+        serviceCollection.AddScoped<IFileManager, FileManager>();
 
         return serviceCollection;
     }
