@@ -26,7 +26,11 @@ services:
       tests-db:
         condition: service_healthy
     environment:
-      - ConnectionStrings__DefaultConnection=User ID=postgres;Password=123;Host=tests-db;Port=5432;Database=testsNEOLab;Pooling=true;
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - YandexStorage__BucketName=${YANDEX_BUCKET_NAME}
+      - YandexStorage__ServiceUrl=${YANDEX_SERVICE_URL}
+      - YandexStorage__AccessKey=${YANDEX_ACCESS_KEY}
+      - YandexStorage__SecretKey=${YANDEX_SECRET_KEY}
     networks:
       - database
     restart: always
