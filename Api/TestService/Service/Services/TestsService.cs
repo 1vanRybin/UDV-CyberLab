@@ -35,7 +35,7 @@ public class TestsService: ITestService
         return _mapper.Map<IEnumerable<TestDto>>(testEntity);
     }
 
-    public async Task<TestDto> GetByIdAsync(Guid id)
+    public async Task<TestDto> GetByIdAsync(Guid id, bool isNeedAnswer)
     {
         var testEntity = await _testStore.GetByIdAsync(id);
         if (testEntity is null)
@@ -45,10 +45,9 @@ public class TestsService: ITestService
 
         var testDto = _mapper.Map<TestDto>(testEntity);
 
-        testDto.Questions = await GetAllQuestionsByTestIdAsync(id);
+        testDto.Questions = await GetAllQuestionsByTestIdAsync(id, isNeedAnswer);
         return testDto;
     }
-
 
     public async Task<UserTest> GetUserTestByIdAsync(Guid userTestId)
     {
@@ -160,23 +159,30 @@ public class TestsService: ITestService
         return testDto;
     }
 
-    public async Task<ICollection<object>> GetAllQuestionsByTestIdAsync(Guid testId)
+    public async Task<ICollection<object>> GetAllQuestionsByTestIdAsync(Guid testId, bool isNeedAnswer)
     {
         var questions = await _testStore.GetAllQuestionsByTestIdAsync(testId);
 
         var res = new List<object>();
         foreach(var question in questions)
         {
-            object? questionRes = question switch
+            if (!isNeedAnswer)
             {
-                QuestionCompliance compliance => compliance,
-                QuestionFile file => file,
-                QuestionOpen open => open,
-                QuestionVariant variant => variant,
-                _ => null
-            };
+                switch (question)
+                {
+                    case QuestionCompliance compliance:
+                        compliance.RightCompliances = null;
+                        break;
+                    case QuestionOpen open:
+                        open.Answer = null;
+                        break;
+                    case QuestionVariant variant:
+                        variant.CorrectAnswers = null;
+                        break;
+                }
+            }
 
-            res.Add(questionRes);
+            res.Add(question);
         }
 
         return res;
