@@ -111,7 +111,7 @@ public class QuestionService : IQuestionService
             return;
         }
 
-        var question = await _questionRepository.GetByIdAsync(questionBase.Id);
+        var question = await _repository.GetByIdAsync<QuestionBase>(questionBase.Id, true);
         if (question is null)
         {
             return;

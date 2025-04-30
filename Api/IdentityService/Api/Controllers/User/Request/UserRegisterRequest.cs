@@ -1,6 +1,5 @@
 ﻿using Core.BasicRoles;
 using System.ComponentModel.DataAnnotations;
-using Core.ValidateAttributes.Roles;
 
 namespace IdentityServerApi.Controllers.User.Request;
 
@@ -16,6 +15,5 @@ public class UserRegisterRequest
     public string Password { get; set; }
     
     [Required]
-    [RoleValidation]
     public UserRole Role { get; set; }
 }

@@ -1,6 +1,4 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using Core.BasicRoles;
 using Domain.Entities;
 using IdentityServerApi.Controllers.User.Request;
 using Microsoft.AspNetCore.Mvc;
@@ -13,16 +11,9 @@ namespace Api.Controllers;
 public class AuthorizeController : ControllerBase
 {
     private readonly IUserService _userService;
-    public AuthorizeController(IServiceProvider serviceProvider, 
-        IHttpContextAccessor httpContextAccessor)
+    public AuthorizeController(IUserService userService)
     {
-        var claimsIdentity = httpContextAccessor.HttpContext?.User.Identity as ClaimsIdentity;
-        var roleClaim = claimsIdentity?.Claims
-            .FirstOrDefault(c => c.Type == ClaimTypes.Role && c.Value == UserRole.ADMIN.ToString());
-        var role = roleClaim?.Value ?? UserRole.USER.ToString(); 
-        
-        _userService = serviceProvider.GetService<IUserService>() ?? 
-                       throw new InvalidOperationException("User service not found for the specified role.");
+        _userService = userService;
     }
 
 

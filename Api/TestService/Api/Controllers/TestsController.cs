@@ -33,9 +33,9 @@ public class TestController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType(typeof(TestDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<TestDto>> GetTest(Guid id)
+    public async Task<ActionResult<TestDto>> GetTest(Guid id, [FromQuery] bool isNeedAnswer)
     {
-        var test = await _testService.GetByIdAsync(id);
+        var test = await _testService.GetByIdAsync(id, isNeedAnswer);
 
         if (test == null)
         {
