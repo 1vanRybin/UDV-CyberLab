@@ -7,10 +7,10 @@ vpc_name     = "neolab-network"
 subnet_cidr  = "10.0.0.0/16"
 
 vm_name      = "neolab-server"
-vm_image_id  = "fd841mrf59dg3qut0om3"
+vm_image_id  = "fd8do9vdccgdhgt5lodk"
 vm_cores     = 2
 vm_memory    = 4
-vm_disk_size = 10
+vm_disk_size = 20
 
 ssh_key_path = "~/.ssh/id_rsa.pub"
 

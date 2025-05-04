@@ -26,7 +26,7 @@ variable "vm_name" {
   default = "neolab-server"
 }
 variable "vm_image_id" {
-  default = "fd841mrf59dg3qut0om3" # Ubuntu 20.04
+  default = "fd8do9vdccgdhgt5lodk" # Ubuntu 20.04
 }
 variable "vm_cores" {
   default = 2
