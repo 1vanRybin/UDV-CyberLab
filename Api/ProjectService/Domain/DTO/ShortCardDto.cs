@@ -2,6 +2,7 @@
 {
     public class ShortCardDto
     {
+        public Guid Id { get; set; }
         public required string Name { get; set; }
         public string? OwnerName { get; set; }
         public Guid? OwnerId { get; set; }
