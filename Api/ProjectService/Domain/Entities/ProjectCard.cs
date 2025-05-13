@@ -8,6 +8,7 @@ namespace Domain.Entities
         public required string Description { get; set; } 
         public string? ShortDescription { get; set; }
         public required string OwnerName { get; set; }
+        public required Guid OwnerId { get; set; }
         public required double Rating { get; set; }
         public required string LogoPath { get; set; }
         public string? PhotoPath { get; set; }

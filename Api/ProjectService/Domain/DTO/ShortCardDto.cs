@@ -3,6 +3,8 @@
     public class ShortCardDto
     {
         public required string Name { get; set; }
+        public string? OwnerName { get; set; }
+        public Guid? OwnerId { get; set; }
         public string? ShortDescription { get; set; }
         public required double Rating { get; set; }
         public required string LogoPath { get; set; }

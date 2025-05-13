@@ -1,4 +1,5 @@
 ﻿using Domain.DTO;
+using ExampleCore.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
@@ -24,8 +25,10 @@ public class ProjectCardController(IProjectService _projectService) : Controller
     [HttpPost]
     public async Task<IActionResult> CreateProjectCard([FromForm] ProjectCardDTO request)
     {
+        var ownerId = UserHelper.GetUserId(HttpContext.Request);
+
         var guid = await _projectService.CreateAsync(request, request.LogoPhoto, request.ProjectPhoto,
-            request.Documentation);
+            request.Documentation, ownerId);
 
         return Ok(guid);
     }
