@@ -42,6 +42,10 @@ services:
         condition: service_healthy
     environment:
       - ConnectionStrings__DefaultConnection=User ID=postgres;Password=123;Host=projects-db;Port=5432;Database=projectsNEOLab;Pooling=true;
+      - YandexStorage__BucketName=${YANDEX_BUCKET_NAME}
+      - YandexStorage__ServiceUrl=${YANDEX_SERVICE_URL}
+      - YandexStorage__AccessKey=${YANDEX_ACCESS_KEY}
+      - YandexStorage__SecretKey=${YANDEX_SECRET_KEY}
     networks:
       - database
     restart: always
