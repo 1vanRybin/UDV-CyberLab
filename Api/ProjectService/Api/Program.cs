@@ -15,7 +15,7 @@ builder.Services.AddCors(cors =>
         .WithOrigins("https://localhost:7023",
             "http://90.156.168.7:8080",
             "https://neolab.aydlioh.ru",
-            "http://localhost:7084",
+            "http://localhost:5173",
             "http://localhost:4173")
         .AllowAnyHeader()
         .AllowAnyMethod()
