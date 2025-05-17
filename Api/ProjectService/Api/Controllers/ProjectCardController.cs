@@ -32,4 +32,19 @@ public class ProjectCardController(IProjectService _projectService) : Controller
 
         return Ok(guid);
     }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateProjectCard([FromForm] ProjectCardUpdateDto request)
+    {
+        var guid = await _projectService.UpdateAsync(request);
+
+        return Ok(guid);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> DeleteProjectCard(Guid id)
+    {
+        //todo
+        return Ok(id);
+    }
 }

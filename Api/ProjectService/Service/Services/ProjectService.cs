@@ -93,4 +93,9 @@ public class ProjectService(
 
         return _mapper.Map<ShortCardDto[]>(cards);
     }
+
+    public Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto)
+    {
+        throw new NotImplementedException();
+    }
 }

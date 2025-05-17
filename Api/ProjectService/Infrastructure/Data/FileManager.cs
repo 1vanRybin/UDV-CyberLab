@@ -66,4 +66,22 @@ public class FileManager : IFileManager
             return (null, null);
         }
     }
+
+    public async Task DeleteAsync(string objectKey)
+    {
+        try
+        {
+            var deleteRequest = new DeleteObjectRequest
+            {
+                BucketName = _bucketName,
+                Key = objectKey
+            };
+
+            await _s3Client.DeleteObjectAsync(deleteRequest);
+        }
+        catch (AmazonS3Exception ex)
+        {
+            //_logger.LogError($"Error deleting file {objectKey}: {ex.Message}");
+        }
+    }
 }

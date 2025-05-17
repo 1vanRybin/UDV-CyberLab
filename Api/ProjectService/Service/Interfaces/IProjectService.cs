@@ -14,4 +14,5 @@ public interface IProjectService
     Task<ProjectCardFilesResponse> GetProjectFilesAsync(Guid projectId);
     Task<(byte[] Data, string MimeType)> GetProjectFileAsync(string path);
     Task<ShortCardDto[]> GetAllShortCards();
+    Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto);
 }
