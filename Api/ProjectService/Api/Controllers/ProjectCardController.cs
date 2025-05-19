@@ -1,5 +1,6 @@
 ﻿using Domain.DTO;
 using ExampleCore.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Service.Interfaces;
 
@@ -7,6 +8,7 @@ namespace Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ProjectCardController(IProjectService _projectService) : ControllerBase
 {
     [HttpGet("{id}")]
@@ -15,11 +17,17 @@ public class ProjectCardController(IProjectService _projectService) : Controller
         var card = await _projectService.GetByIdAsync(id);
         return Ok(card);
     }
+
     [HttpGet("allShort")]
-    public async Task<IActionResult> GetAllShortProjectCards()
+    public async Task<IActionResult> GetAllShortProjectCards([FromQuery] SortOrder sortOrder = SortOrder.Default)
     {
-        var cards = await _projectService.GetAllShortCards();
-        return Ok(cards);
+        var filter = new ProjectFilterDto
+        {
+            SortOrder = sortOrder
+        };
+
+        var filteredProjects = await _projectService.GetFilteredProjectsAsync(filter);
+        return Ok(filteredProjects);
     }
 
     [HttpPost]
@@ -46,5 +54,16 @@ public class ProjectCardController(IProjectService _projectService) : Controller
     {
         //todo
         return Ok(id);
+    }
+
+    /// <summary>
+    /// Зарегистрировать посещение лендинга проекта
+    /// </summary>
+    [HttpPost("landing-visit/{id}")]
+    [AllowAnonymous] // Разрешаем анонимные запросы
+    public async Task<IActionResult> RecordLandingVisit(Guid id)
+    {
+        await _projectService.IncrementLandingVisitsCountAsync(id);
+        return Ok();
     }
 }

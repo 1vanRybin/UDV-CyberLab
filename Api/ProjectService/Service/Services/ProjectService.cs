@@ -15,10 +15,10 @@ public class ProjectService(
     : IProjectService
 {
     public async Task<Guid> CreateAsync(ProjectCardDTO cardDto,
-    IFormFile logo,
-    IFormFile? photo,
-    IFormFile documentation,
-    Guid ownerId)
+        IFormFile logo,
+        IFormFile? photo,
+        IFormFile documentation,
+        Guid ownerId)
     {
         var card = _mapper.Map<ProjectCard>(cardDto);
         card.Id = Guid.NewGuid();
@@ -27,7 +27,8 @@ public class ProjectService(
 
         card.LogoPath = await _fileManager.CreateAsync(logo, projectDirectory, $"logo_{card.Name}");
         card.PhotoPath = await _fileManager.CreateAsync(photo, projectDirectory, $"photo_{card.Name}");
-        card.DocumentationPath = await _fileManager.CreateAsync(documentation, projectDirectory, $"documentation_{card.Name}");
+        card.DocumentationPath =
+            await _fileManager.CreateAsync(documentation, projectDirectory, $"documentation_{card.Name}");
         card.OwnerId = ownerId;
 
         var cardId = await _projectRepository.CreateAsync(card.Id, card);
@@ -42,9 +43,10 @@ public class ProjectService(
         {
             throw new NotFoundException($"Project with id {id} didn't find.");
         }
+
         card.ViewsCount++;
 
-        await _projectRepository.UpdateAsync(card);   
+        await _projectRepository.UpdateAsync(card);
 
         return _mapper.Map<ProjectPageDto>(card);
     }
@@ -87,15 +89,40 @@ public class ProjectService(
         return await _fileManager.GetFileWithMimeTypeAsync(path);
     }
 
-    public async Task<ShortCardDto[]> GetAllShortCards()
+    public async Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto)
     {
-        var cards = await _projectRepository.GetAllAsync<ProjectCard>();
+        var existingCard = await _projectRepository.GetByIdAsync<ProjectCard>(updateDto.Id)
+                           ?? throw new NotFoundException($"Project with id {updateDto.Id} not found.");
 
-        return _mapper.Map<ShortCardDto[]>(cards);
+        _mapper.Map(updateDto, existingCard);
+
+        await _projectRepository.UpdateAsync(existingCard);
+        return existingCard.Id;
     }
 
-    public Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto)
+
+    public async Task<ShortCardDto[]> GetFilteredProjectsAsync(ProjectFilterDto filter)
     {
-        throw new NotImplementedException();
+        var projects = await _projectRepository.GetFilteredProjectsAsync(filter);
+
+        var shortCards = _mapper.Map<ShortCardDto[]>(projects);
+
+        return shortCards;
+    }
+
+    /// <summary>
+    /// Увеличить счетчик посещений лендинга проекта
+    /// </summary>
+    /// <param name="projectId">Идентификатор проекта</param>
+    public async Task IncrementLandingVisitsCountAsync(Guid projectId)
+    {
+        var project = await _projectRepository.GetByIdAsync<ProjectCard>(projectId);
+        if (project == null)
+        {
+            throw new NotFoundException($"Project with id {projectId} didn't find.");
+        }
+
+        project.LandingVisitsCount++;
+        await _projectRepository.UpdateAsync(project);
     }
 }

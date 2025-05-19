@@ -10,9 +10,11 @@ public interface IProjectService
         IFormFile? photo,
         IFormFile documentation,
         Guid ownerId);
+
     Task<ProjectPageDto> GetByIdAsync(Guid id);
     Task<ProjectCardFilesResponse> GetProjectFilesAsync(Guid projectId);
     Task<(byte[] Data, string MimeType)> GetProjectFileAsync(string path);
-    Task<ShortCardDto[]> GetAllShortCards();
+    Task<ShortCardDto[]> GetFilteredProjectsAsync(ProjectFilterDto filter);
     Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto);
+    Task IncrementLandingVisitsCountAsync(Guid projectId);
 }

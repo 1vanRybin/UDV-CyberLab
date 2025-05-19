@@ -1,3 +1,9 @@
-﻿namespace Domain.Interfaces;
+﻿using Domain.DTO;
+using Domain.Entities;
 
-public interface IProjectRepository : IStandartStore;
+namespace Domain.Interfaces;
+
+public interface IProjectRepository : IStandartStore
+{
+    Task<List<ProjectCard>> GetFilteredProjectsAsync(ProjectFilterDto filter);
+}

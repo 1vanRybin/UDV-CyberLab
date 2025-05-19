@@ -8,6 +8,9 @@ public static class ServiceStartUp
     public static IServiceCollection TryAddServices(this IServiceCollection serviceCollection)
     {
         serviceCollection.AddScoped<IProjectService, ProjectService>();
+        serviceCollection.AddScoped<ICommentService, CommentService>();
+        serviceCollection.AddScoped<IRatingService, RatingService>();
+        serviceCollection.AddScoped<IAdminService, AdminService>();
         AddAutoMapper(serviceCollection);
         return serviceCollection;
     }
@@ -15,6 +18,8 @@ public static class ServiceStartUp
     private static void AddAutoMapper(IServiceCollection services)
     {
         services.AddAutoMapper(
-            typeof(ProjectProfile));
+            typeof(ProjectProfile),
+            typeof(CommentProfile),
+            typeof(RatingProfile));
     }
 }

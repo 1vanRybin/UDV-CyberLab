@@ -10,15 +10,15 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 public static class InfrastuctureStartup
 {
-    public static IServiceCollection TryAddInfrastucture(this IServiceCollection serviceCollection, IConfigurationManager configurationManager)
-    {        var connectionString = configurationManager.GetConnectionString("DefaultConnection");
-
+    public static IServiceCollection TryAddInfrastucture(this IServiceCollection serviceCollection,
+        IConfigurationManager configurationManager)
+    {
+        var connectionString = configurationManager.GetConnectionString("DefaultConnection");
         serviceCollection.TryAddScoped<IProjectRepository, ProjectRepository>();
+        serviceCollection.TryAddScoped<ICommentRepository, CommentRepository>();
+        serviceCollection.TryAddScoped<IRatingRepository, RatingRepository>();
 
-        serviceCollection.AddDbContext<ProjectsDbContext>(options =>
-        {
-            options.UseNpgsql(connectionString);
-        });
+        serviceCollection.AddDbContext<ProjectsDbContext>(options => { options.UseNpgsql(connectionString); });
 
         serviceCollection.AddScoped<DbContext>(provider => provider.GetService<ProjectsDbContext>());
 
