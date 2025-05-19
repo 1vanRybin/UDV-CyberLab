@@ -49,7 +49,7 @@ public class ProjectCardController(IProjectService _projectService) : Controller
         return Ok(guid);
     }
 
-    [HttpPost]
+    [HttpDelete]
     public async Task<IActionResult> DeleteProjectCard(Guid id)
     {
         //todo

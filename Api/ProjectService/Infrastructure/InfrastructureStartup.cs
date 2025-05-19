@@ -1,6 +1,7 @@
 ﻿using Amazon.Runtime;
 using Amazon.S3;
 using Domain.Interfaces;
+using ExampleCore.AuthOptions;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public static class InfrastuctureStartup
         serviceCollection.TryAddScoped<IProjectRepository, ProjectRepository>();
         serviceCollection.TryAddScoped<ICommentRepository, CommentRepository>();
         serviceCollection.TryAddScoped<IRatingRepository, RatingRepository>();
-
+        serviceCollection.AddAuth();
         serviceCollection.AddDbContext<ProjectsDbContext>(options => { options.UseNpgsql(connectionString); });
 
         serviceCollection.AddScoped<DbContext>(provider => provider.GetService<ProjectsDbContext>());
