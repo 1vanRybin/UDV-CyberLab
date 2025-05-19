@@ -15,6 +15,5 @@ namespace Domain.Entities
         public required string LandingURL { get; set; }
         public required string DocumentationPath { get; set; }
         public int ViewsCount { get; set; }
-        public int LandingVisitsCount { get; set; }
     }
 }

@@ -47,7 +47,7 @@ namespace Service.Services
                     Id = project.Id,
                     Name = project.Name,
                     ViewsCount = project.ViewsCount,
-                    LandingVisits = project.LandingVisitsCount,
+                    LandingVisits = project.ViewsCount,
                     Rating = project.Rating,
                     TotalRatings = ratingCount,
                     CommentsCount = projectCommentCounts.GetValueOrDefault(project.Id)
@@ -79,7 +79,7 @@ namespace Service.Services
                 Id = project.Id,
                 Name = project.Name,
                 ViewsCount = project.ViewsCount,
-                LandingVisits = project.LandingVisitsCount,
+                LandingVisits = project.ViewsCount,
                 Rating = project.Rating,
                 TotalRatings = ratingCount,
                 CommentsCount = comments.Count

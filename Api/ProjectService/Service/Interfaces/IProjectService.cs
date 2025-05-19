@@ -16,5 +16,4 @@ public interface IProjectService
     Task<(byte[] Data, string MimeType)> GetProjectFileAsync(string path);
     Task<ShortCardDto[]> GetFilteredProjectsAsync(ProjectFilterDto filter);
     Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto);
-    Task IncrementLandingVisitsCountAsync(Guid projectId);
 }

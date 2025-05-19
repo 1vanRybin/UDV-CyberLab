@@ -109,20 +109,4 @@ public class ProjectService(
 
         return shortCards;
     }
-
-    /// <summary>
-    /// Увеличить счетчик посещений лендинга проекта
-    /// </summary>
-    /// <param name="projectId">Идентификатор проекта</param>
-    public async Task IncrementLandingVisitsCountAsync(Guid projectId)
-    {
-        var project = await _projectRepository.GetByIdAsync<ProjectCard>(projectId);
-        if (project == null)
-        {
-            throw new NotFoundException($"Project with id {projectId} didn't find.");
-        }
-
-        project.LandingVisitsCount++;
-        await _projectRepository.UpdateAsync(project);
-    }
 }

@@ -55,15 +55,4 @@ public class ProjectCardController(IProjectService _projectService) : Controller
         //todo
         return Ok(id);
     }
-
-    /// <summary>
-    /// Зарегистрировать посещение лендинга проекта
-    /// </summary>
-    [HttpPost("landing-visit/{id}")]
-    [AllowAnonymous] // Разрешаем анонимные запросы
-    public async Task<IActionResult> RecordLandingVisit(Guid id)
-    {
-        await _projectService.IncrementLandingVisitsCountAsync(id);
-        return Ok();
-    }
 }
