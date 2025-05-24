@@ -51,6 +51,13 @@ public class ProjectService(
         return _mapper.Map<ProjectPageDto>(card);
     }
 
+    public async Task<ShortCardDto[]> GetUserProjects(Guid userId)
+    {
+       var projects = await _projectRepository.GetUserProjectsAsync(userId);
+
+        return _mapper.Map<ShortCardDto[]>(projects);
+    }
+
     public async Task<ProjectCardFilesResponse> GetProjectFilesAsync(Guid projectId)
     {
         var card = await _projectRepository.GetByIdAsync<ProjectCard>(projectId);
@@ -163,7 +170,6 @@ public class ProjectService(
         return existingCard.Id;
     }
 
-
     public async Task<ShortCardDto[]> GetFilteredProjectsAsync(ProjectFilterDto filter)
     {
         var projects = await _projectRepository.GetFilteredProjectsAsync(filter);
@@ -171,5 +177,24 @@ public class ProjectService(
         var shortCards = _mapper.Map<ShortCardDto[]>(projects);
 
         return shortCards;
+    }
+
+    public async Task<bool> DeleteProjectCardAsync(Guid cardId)
+    {
+        var card = await _projectRepository.GetByIdAsync<ProjectCard>(cardId);
+        if (!string.IsNullOrEmpty(card.DocumentationPath))
+        {
+            await _fileManager.DeleteAsync(card.DocumentationPath);
+        }
+        if (!string.IsNullOrEmpty(card.PhotoPath))
+        {
+            await _fileManager.DeleteAsync(card.PhotoPath);
+        }
+        if (!string.IsNullOrEmpty(card.LogoPath))
+        {
+            await _fileManager.DeleteAsync(card.LogoPath);
+        }
+
+        return card != null && await _projectRepository.DeleteAsync(card);
     }
 }
