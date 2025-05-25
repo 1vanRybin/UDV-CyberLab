@@ -8,5 +8,7 @@ namespace Infrastucture;
 public class ApplicationDbContext: IdentityDbContext<User,IdentityRole<Guid>,Guid>
 {
     public ApplicationDbContext(DbContextOptions options)
-        : base(options){}
+        : base(options){
+        Database.EnsureCreated();
+    }
 }

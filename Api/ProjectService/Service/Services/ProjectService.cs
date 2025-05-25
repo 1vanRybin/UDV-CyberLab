@@ -51,6 +51,13 @@ public class ProjectService(
         return _mapper.Map<ProjectPageDto>(card);
     }
 
+    public async Task<ShortCardDto[]> GetUserProjects(Guid userId)
+    {
+       var projects = await _projectRepository.GetUserProjectsAsync(userId);
+
+        return _mapper.Map<ShortCardDto[]>(projects);
+    }
+
     public async Task<ProjectCardFilesResponse> GetProjectFilesAsync(Guid projectId)
     {
         var card = await _projectRepository.GetByIdAsync<ProjectCard>(projectId);
@@ -91,15 +98,77 @@ public class ProjectService(
 
     public async Task<Guid> UpdateAsync(ProjectCardUpdateDto updateDto)
     {
-        var existingCard = await _projectRepository.GetByIdAsync<ProjectCard>(updateDto.Id)
-                           ?? throw new NotFoundException($"Project with id {updateDto.Id} not found.");
+        var existingCard = await _projectRepository.GetByIdAsync<ProjectCard>(updateDto.Id);
+        if (existingCard == null)
+        {
+            throw new NotFoundException($"Project with id {updateDto.Id} didn't find.");
+        }
 
-        _mapper.Map(updateDto, existingCard);
+        if (!string.IsNullOrEmpty(updateDto.Name))
+        {
+            existingCard.Name = updateDto.Name;
+        }
+
+        if (!string.IsNullOrEmpty(updateDto.Description))
+        {
+            existingCard.Description = updateDto.Description;
+        }
+
+        if (!string.IsNullOrEmpty(updateDto.ShortDescription))
+        {
+            existingCard.ShortDescription = updateDto.ShortDescription;
+        }
+
+        if (!string.IsNullOrEmpty(updateDto.LandingURL))
+        {
+            existingCard.LandingURL = updateDto.LandingURL;
+        }
+
+        var projectDirectory = $"uploads/{existingCard.Id}";
+
+        if (updateDto.LogoPhoto != null && updateDto.LogoPhoto.Length > 0)
+        {
+            if (!string.IsNullOrEmpty(existingCard.LogoPath))
+            {
+                await _fileManager.DeleteAsync(existingCard.LogoPath);
+            }
+
+            existingCard.LogoPath = await _fileManager.CreateAsync(
+                updateDto.LogoPhoto,
+                projectDirectory,
+                $"logo_{existingCard.Name}");
+        }
+
+        if (updateDto.ProjectPhoto != null && updateDto.ProjectPhoto.Length > 0)
+        {
+            if (!string.IsNullOrEmpty(existingCard.PhotoPath))
+            {
+                await _fileManager.DeleteAsync(existingCard.PhotoPath);
+            }
+
+            existingCard.PhotoPath = await _fileManager.CreateAsync(
+                updateDto.ProjectPhoto,
+                projectDirectory,
+                $"photo_{existingCard.Name}");
+        }
+
+        if (updateDto.Documentation != null && updateDto.Documentation.Length > 0)
+        {
+            if (!string.IsNullOrEmpty(existingCard.DocumentationPath))
+            {
+                await _fileManager.DeleteAsync(existingCard.DocumentationPath);
+            }
+
+            existingCard.DocumentationPath = await _fileManager.CreateAsync(
+                updateDto.Documentation,
+                projectDirectory,
+                $"documentation_{existingCard.Name}");
+        }
 
         await _projectRepository.UpdateAsync(existingCard);
+
         return existingCard.Id;
     }
-
 
     public async Task<ShortCardDto[]> GetFilteredProjectsAsync(ProjectFilterDto filter)
     {
@@ -108,5 +177,24 @@ public class ProjectService(
         var shortCards = _mapper.Map<ShortCardDto[]>(projects);
 
         return shortCards;
+    }
+
+    public async Task<bool> DeleteProjectCardAsync(Guid cardId)
+    {
+        var card = await _projectRepository.GetByIdAsync<ProjectCard>(cardId);
+        if (!string.IsNullOrEmpty(card.DocumentationPath))
+        {
+            await _fileManager.DeleteAsync(card.DocumentationPath);
+        }
+        if (!string.IsNullOrEmpty(card.PhotoPath))
+        {
+            await _fileManager.DeleteAsync(card.PhotoPath);
+        }
+        if (!string.IsNullOrEmpty(card.LogoPath))
+        {
+            await _fileManager.DeleteAsync(card.LogoPath);
+        }
+
+        return card != null && await _projectRepository.DeleteAsync(card);
     }
 }

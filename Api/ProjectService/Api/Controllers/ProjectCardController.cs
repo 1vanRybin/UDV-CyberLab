@@ -30,6 +30,14 @@ public class ProjectCardController(IProjectService _projectService) : Controller
         return Ok(filteredProjects);
     }
 
+    [HttpGet("myCards")]
+    public async Task<IActionResult> GetUserCards()
+    {
+        var currentUserId = UserHelper.GetUserId(HttpContext.Request);
+
+        var cards = await _projectService.GetUserProjects(currentUserId);
+        return Ok(cards);
+    }
     [HttpPost]
     public async Task<IActionResult> CreateProjectCard([FromForm] ProjectCardDTO request)
     {
@@ -49,10 +57,11 @@ public class ProjectCardController(IProjectService _projectService) : Controller
         return Ok(guid);
     }
 
-    [HttpPost]
+    [HttpDelete]
     public async Task<IActionResult> DeleteProjectCard(Guid id)
     {
-        //todo
-        return Ok(id);
+        var response = await _projectService.DeleteProjectCardAsync(id);
+
+        return response ? Ok("Deleted") : NotFound($"No cards with id {id}");
     }
 }

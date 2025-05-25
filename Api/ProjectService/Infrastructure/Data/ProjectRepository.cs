@@ -23,4 +23,11 @@ public class ProjectRepository(ProjectsDbContext context) : BaseRepository(conte
 
         return await query.ToListAsync();
     }
+
+    public async Task<List<ProjectCard>> GetUserProjectsAsync(Guid userId)
+    {
+        var query = context.Cards.Where(c => c.OwnerId == userId);
+
+        return await query.ToListAsync();
+    }
 }
