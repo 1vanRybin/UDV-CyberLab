@@ -31,6 +31,9 @@ public class CommentService(
             CreatedAt = DateTime.UtcNow
         };
 
+        project.CommentsCount++;
+        await _projectRepository.UpdateAsync(project);
+
         await _commentRepository.CreateAsync(comment.Id, comment);
 
         return _mapper.Map<CommentDto>(comment);
@@ -80,6 +83,9 @@ public class CommentService(
         {
             throw new NoAccessException("You are not authorized to delete this comment.");
         }
+        var project = await _projectRepository.GetByIdAsync<ProjectCard>(comment.ProjectId);
+        project.CommentsCount--;
+        await _projectRepository.UpdateAsync(project);
 
         await _commentRepository.DeleteAsync(comment);
 

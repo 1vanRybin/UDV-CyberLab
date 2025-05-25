@@ -10,5 +10,6 @@
         public required double Rating { get; set; }
         public required string LogoPath { get; set; }
         public int ViewsCount { get; set; }
+        public int CommentsCount { get; set; }
     }
 }
