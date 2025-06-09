@@ -50,5 +50,12 @@ namespace Api.Controllers
             var result = await _adminService.DeleteCommentAsync(commentId);
             return Ok(result);
         }
+
+        [HttpDelete("user/{userId}")]
+        public async Task<IActionResult> DeleteUser(Guid userId)
+        {
+            var result = await _adminService.DeleteUserAsync(userId);
+            return Ok(result);
+        }
     }
 }
