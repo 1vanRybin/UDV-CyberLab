@@ -94,6 +94,10 @@ namespace Service.Services
                 throw new NotFoundException($"Комментарий с ID {commentId} не найден");
             }
 
+            var project = await _projectRepository.GetByIdAsync<ProjectCard>(comment.ProjectId);
+            project.CommentsCount--;
+            await _projectRepository.UpdateAsync(project);
+
             await _commentRepository.DeleteAsync(comment);
 
             return true;
