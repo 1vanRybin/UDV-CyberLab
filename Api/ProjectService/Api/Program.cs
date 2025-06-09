@@ -1,8 +1,8 @@
-using Api.Middlewares;
+using Core.Middlewares;
 using ExampleCore.Swagger;
 using Infrastructure;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,9 +25,9 @@ builder.Services.AddCors(cors =>
 builder.Services.AddControllers()
     .AddNewtonsoftJson(options =>
     {
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 
-        options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
     });
 
 var app = builder.Build();

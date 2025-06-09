@@ -1,3 +1,4 @@
+using Core.Middlewares;
 using ExampleCore.Swagger;
 using Infrastucture;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -39,6 +40,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
+
+app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 
 app.Run();
