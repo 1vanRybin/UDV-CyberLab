@@ -13,7 +13,5 @@ namespace Service.Interfaces
         Task<bool> DeleteProjectAsync(Guid projectId);
 
         Task<List<CommentDto>> GetAllCommentsForModerationAsync();
-
-        Task<bool> DeleteUserAsync(Guid userId);
     }
 }

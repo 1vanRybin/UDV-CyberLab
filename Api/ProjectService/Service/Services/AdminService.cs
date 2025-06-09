@@ -3,7 +3,6 @@ using CRM.Data.Common.Exceptions;
 using Domain.DTO;
 using Domain.Entities;
 using Domain.Interfaces;
-using Microsoft.AspNetCore.Identity;
 using Service.Interfaces;
 
 namespace Service.Services
@@ -14,7 +13,6 @@ namespace Service.Services
         private readonly IMapper _mapper;
         private readonly IProjectRepository _projectRepository;
         private readonly IRatingRepository _ratingRepository;
-        private readonly UserManager<User> _userManager;
 
         public AdminService(
             IProjectRepository projectRepository,
@@ -141,16 +139,6 @@ namespace Service.Services
             }
 
             return _mapper.Map<List<CommentDto>>(allComments);
-        }
-
-        public async Task<bool> DeleteUserAsync(Guid userId)
-        {
-            var user = await _userManager.FindByIdAsync(userId.ToString());
-            if (user == null) throw new NotFoundException($"User with id {userId} not found.");
-
-            var result = await _userManager.DeleteAsync(user);
-
-            return result.Succeeded;
         }
     }
 }
