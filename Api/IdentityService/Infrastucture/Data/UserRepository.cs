@@ -2,6 +2,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using Core.BasicRoles;
 using Core.Helpers;
+using CRM.Data.Common.Exceptions;
 using Domain.Entities;
 using Domain.Interfaces;
 using Medo;
@@ -13,8 +14,8 @@ public class UserRepository: IUserStore
 {
     private readonly UserManager<User> _userManager;
     private readonly ApplicationDbContext _dbContext;
-    private const int PageSize = 50;//todo обсудить ограничение с фронтом 
-    
+    private const int PageSize = 50;//todo обсудить ограничение с фронтом
+
     public UserRepository(UserManager<User> userManager,
         ApplicationDbContext dbContext)
     {
@@ -32,16 +33,16 @@ public class UserRepository: IUserStore
         {
             return createResult;
         }
-        
+
         var roleResult = await _userManager.AddToRoleAsync(user, userRole);
         if (!roleResult.Succeeded)
         {
             await transaction.RollbackAsync();
             return roleResult;
         }
-        
+
         await transaction.CommitAsync();
-        
+
         return createResult;
     }
 
@@ -81,10 +82,24 @@ public class UserRepository: IUserStore
         return user;
     }
 
+    public async Task<IdentityResult> DeleteAsync(User user)
+    {
+        var result = await _userManager.DeleteAsync(user);
+
+        return result;
+    }
+
+    public async Task<User?> FindByIdAsync(Guid userId)
+    {
+        var result =  await _userManager.FindByIdAsync(userId.ToString());
+
+        return result;
+    }
+
     public async Task<List<User>> GetByPageAsync(int page)
     {
         var userQuery = _userManager.Users;
-            
+
         var paginatedUsers = await userQuery
             .Skip((page - 1) * PageSize)
             .Take(PageSize)
@@ -92,7 +107,7 @@ public class UserRepository: IUserStore
 
         return paginatedUsers;
     }
-    
+
     public async Task<User?> CheckExistAsync(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());

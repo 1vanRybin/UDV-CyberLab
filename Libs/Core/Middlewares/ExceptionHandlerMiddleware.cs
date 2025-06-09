@@ -2,10 +2,11 @@
 using CRM.Data.Common.Exceptions;
 using JetBrains.Annotations;
 using System.Net;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
-    namespace Api.Middlewares
+namespace Api.Middlewares
     {
-        [UsedImplicitly]
         internal class ExceptionHandlerMiddleware
         {
             private readonly RequestDelegate _next;

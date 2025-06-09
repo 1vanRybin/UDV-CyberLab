@@ -1,6 +1,7 @@
 using Api.Middlewares;
 using ExampleCore.Swagger;
 using Infrastructure;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
