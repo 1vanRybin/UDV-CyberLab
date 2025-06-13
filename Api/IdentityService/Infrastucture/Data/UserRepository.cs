@@ -134,4 +134,30 @@ public class UserRepository : IUserStore
 
         return usersWithRoles;
     }
+
+    public async Task<List<User>> SearchByNameAsync(string name)
+    {
+        var usersWithRoles = await _dbContext.Users
+            .Where(u => u.UserName != null && EF.Functions.ILike(u.UserName, $"%{name}%"))
+            .Select(u => new User
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email,
+                Role = _dbContext.UserRoles.Where(ur => ur.UserId == u.Id).Join(
+                        _dbContext.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => r.Name
+                    ).Select(roleName =>
+                        roleName == nameof(UserRole.ADMIN) ? UserRole.ADMIN :
+                        roleName == nameof(UserRole.TEACHER) ? UserRole.TEACHER :
+                        UserRole.USER
+                    )
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
+
+        return usersWithRoles;
+    }
 }
