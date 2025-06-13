@@ -52,9 +52,9 @@ namespace Api.Controllers
         }
 
         [HttpGet("projects/search")]
-        public async Task<IActionResult> SearchProjects([FromQuery] string searchQuery)
+        public async Task<IActionResult> SearchProjects([FromQuery] string projectName)
         {
-            var projects = await _adminService.SearchProjectsByNameAsync(searchQuery);
+            var projects = await _adminService.SearchProjectsByNameAsync(projectName);
             return Ok(projects);
         }
     }
