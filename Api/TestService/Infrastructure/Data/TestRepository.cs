@@ -92,7 +92,8 @@ public class TestRepository : ITestStore
 
         if (!string.IsNullOrEmpty(search))
         {
-            query = query.Where(t => t.Name.Contains(search));
+            query = query.Where(t =>
+                EF.Functions.ILike(t.Name, $"%{search}%"));
         }
 
         if (!string.IsNullOrEmpty(subject))
