@@ -13,9 +13,10 @@ public class AdminController : ControllerBase
     private readonly IAdminService _adminService;
     private readonly IUserService _userService;
 
-    public AdminController(IAdminService adminService)
+    public AdminController(IAdminService adminService, IUserService userService)
     {
         _adminService = adminService;
+        _userService = userService;
     }
 
     [HttpDelete("user/{userId}")]
