@@ -117,6 +117,7 @@ public class UserRepository : IUserStore
             {
                 Id = u.Id,
                 UserName = u.UserName,
+                Email = u.Email,
                 Role = _dbContext.UserRoles.Where(ur => ur.UserId == u.Id).Join(
                         _dbContext.Roles,
                         ur => ur.RoleId,
