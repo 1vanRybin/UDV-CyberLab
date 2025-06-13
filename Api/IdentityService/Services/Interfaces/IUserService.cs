@@ -1,7 +1,7 @@
-﻿using Domain.Entities;
-using Microsoft.AspNetCore.Identity;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using Core.BasicRoles;
+using Domain.Entities;
+using Microsoft.AspNetCore.Identity;
 
 namespace Services.Interfaces
 {
@@ -10,6 +10,6 @@ namespace Services.Interfaces
         Task<IdentityResult> RegisterUserAsync(User user, string Password, UserRole role);
         Task<JwtSecurityToken?> LoginUserAsync(User userLogin, string password);
         Task<User> GetUserInfoAsync(Guid userId);
-        List<User> GetUsersAsync();
+        Task<List<User>> GetUsersAsync();
     }
 }

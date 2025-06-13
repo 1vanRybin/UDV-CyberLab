@@ -36,9 +36,9 @@ namespace Services.Services
             return user;
         }
 
-        public List<User> GetUsersAsync()
+        public async Task<List<User>> GetUsersAsync()
         {
-            var paginatedUsers = _userStore.GetAllAsync();
+            var paginatedUsers = await _userStore.GetAllAsync();
             return paginatedUsers;
         }
 
