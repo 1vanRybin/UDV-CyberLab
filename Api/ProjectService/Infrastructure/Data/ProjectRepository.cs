@@ -35,10 +35,7 @@ public class ProjectRepository(ProjectsDbContext context) : BaseRepository(conte
     {
         return await context.Cards
             .Where(p =>
-                EF.Functions.ILike(p.Name, $"%{searchQuery}%") ||
-                EF.Functions.ILike(p.ShortDescription, $"%{searchQuery}%") ||
-                EF.Functions.ILike(p.Description, $"%{searchQuery}%") ||
-                EF.Functions.ILike(p.OwnerName, $"%{searchQuery}%"))
+                EF.Functions.ILike(p.Name, $"%{searchQuery}%"))
             .OrderByDescending(p => p.Rating)
             .ThenByDescending(p => p.ViewsCount)
             .ToListAsync();
