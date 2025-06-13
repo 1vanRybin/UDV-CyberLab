@@ -10,6 +10,6 @@ namespace Services.Interfaces
         Task<IdentityResult> RegisterUserAsync(User user, string Password, UserRole role);
         Task<JwtSecurityToken?> LoginUserAsync(User userLogin, string password);
         Task<User> GetUserInfoAsync(Guid userId);
-        Task<List<User>> GetUsersAsync();
+        Task<List<User>> GetUsersAsync(string? name);
     }
 }

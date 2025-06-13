@@ -39,9 +39,9 @@ public class UserController : ControllerBase
 
     [HttpGet("users")]
     [Authorize]
-    public async Task<ActionResult<ICollection<UserInfoResponse>>> GetUsers()
+    public async Task<ActionResult<ICollection<UserInfoResponse>>> GetUsers(string? searchName = null)
     {
-        var users = await _userService.GetUsersAsync();
+        var users = await _userService.GetUsersAsync(searchName);
         return users.Select(user => new UserInfoResponse
         {
             UserId = user.Id,

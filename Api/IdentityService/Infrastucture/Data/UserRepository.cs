@@ -110,9 +110,9 @@ public class UserRepository : IUserStore
         return user;
     }
 
-    public async Task<List<User>> GetAllAsync()
+    public async Task<List<User>> SearchByFilter(string? name)
     {
-        var usersWithRoles = await _dbContext.Users
+        var query = _dbContext.Users
             .Select(u => new User
             {
                 Id = u.Id,
@@ -129,16 +129,16 @@ public class UserRepository : IUserStore
                         UserRole.USER
                     )
                     .FirstOrDefault()
-            })
-            .ToListAsync();
+            });
 
-        return usersWithRoles;
+        if (!string.IsNullOrWhiteSpace(name)) query = query.Where(u => EF.Functions.ILike(u.UserName, $"%{name}%"));
+
+        return await query.ToListAsync();
     }
 
-    public async Task<List<User>> SearchByNameAsync(string name)
+    public async Task<List<User>> GetAllAsync()
     {
         var usersWithRoles = await _dbContext.Users
-            .Where(u => u.UserName != null && EF.Functions.ILike(u.UserName, $"%{name}%"))
             .Select(u => new User
             {
                 Id = u.Id,

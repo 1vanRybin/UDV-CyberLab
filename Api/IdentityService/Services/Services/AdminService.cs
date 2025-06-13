@@ -1,5 +1,4 @@
 ﻿using CRM.Data.Common.Exceptions;
-using Domain.Entities;
 using Domain.Interfaces;
 using Services.Interfaces;
 
@@ -13,11 +12,5 @@ public class AdminService(IUserStore userStore) : IAdminService
         if (user == null) throw new NotFoundException($"User with id {userId} not found.");
 
         await userStore.DeleteAsync(user);
-    }
-
-    public async Task<List<User>> SearchUsersByNameAsync(string name)
-    {
-        var users = await userStore.SearchByNameAsync(name);
-        return users;
     }
 }
