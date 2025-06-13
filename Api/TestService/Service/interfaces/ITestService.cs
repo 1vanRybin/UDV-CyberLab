@@ -7,7 +7,7 @@ namespace Service.interfaces;
 
 public interface ITestService
 {
-    Task<IEnumerable<TestDto>> GetAsync();
+    Task<IEnumerable<TestDto>> GetAsync(string? difficulty = null, string? search = null, string? subject = null);
 
     Task<TestDto> GetByIdAsync(Guid id, bool isNeedAnswer);
     Task<ShortTestDto> GetByIdShortAsync(Guid id, Guid userId);

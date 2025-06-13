@@ -80,10 +80,28 @@ public class TestRepository : ITestStore
             .ToListAsync();
     }
 
-    public async Task<List<Test?>> GetAllAsync()
+    public async Task<List<Test?>> GetAllAsync(string? difficulty = null, string? search = null, string? subject = null)
     {
-        return await _context.Tests
-            .Include(t => t.Questions).ToListAsync();
+        IQueryable<Test?> query = _context.Tests
+            .Include(t => t.Questions);
+
+        if (!string.IsNullOrEmpty(difficulty))
+        {
+            query = query.Where(t => t.Difficulty == difficulty);
+        }
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(t =>
+                EF.Functions.ILike(t.Name, $"%{search}%"));
+        }
+
+        if (!string.IsNullOrEmpty(subject))
+        {
+            query = query.Where(t => t.Theme == subject);
+        }
+
+        return await query.ToListAsync();
     }
 
     public async Task<List<Test?>> GetAllUserTestsAsync(Guid userId)

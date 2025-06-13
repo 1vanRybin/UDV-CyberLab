@@ -10,7 +10,7 @@ public interface ITestStore
     Task<ICollection<UserTest?>> GetUserTestResultsAsync(Guid guid);
     Task<ICollection<UserTest?>> GetLastUserTests(Guid userId);
     Task<ICollection<QuestionBase>> GetAllQuestionsByTestIdAsync(Guid testId);
-    Task<List<Test?>> GetAllAsync();
+    Task<List<Test?>> GetAllAsync(string? difficulty = null, string? search = null, string? subject = null);
     Task<List<Test?>> GetAllUserTestsAsync(Guid userId);
     Task<List<UserTest?>> GetCompletedAsync(Guid userId);
     Task<List<UserTest?>> GetTestResultsAsync(Guid userId, Guid testId);

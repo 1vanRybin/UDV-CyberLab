@@ -27,10 +27,9 @@ public class TestsService: ITestService
         _questionStore = questionStore;
     }
 
-    public async Task<IEnumerable<TestDto>> GetAsync()
+    public async Task<IEnumerable<TestDto>> GetAsync(string? difficulty = null, string? search = null, string? subject = null)
     {
-        // todo ждем когда фронт скажет про погинацию и поменять на  _repository.GetPaginatedAsync<T>(int page, int pageSize)
-        var testEntity = await _testStore.GetAllAsync();
+        var testEntity = await _testStore.GetAllAsync(difficulty, search, subject);
 
         return _mapper.Map<IEnumerable<TestDto>>(testEntity);
     }
