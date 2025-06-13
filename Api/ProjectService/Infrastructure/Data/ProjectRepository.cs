@@ -30,4 +30,12 @@ public class ProjectRepository(ProjectsDbContext context) : BaseRepository(conte
 
         return await query.ToListAsync();
     }
+
+    public async Task<List<ProjectCard>> SearchProjectsByNameAsync(string searchQuery)
+    {
+        return await context.Cards
+            .Where(p => p.Name.Contains(searchQuery) ||
+                        (p.ShortDescription != null && p.ShortDescription.Contains(searchQuery)))
+            .ToListAsync();
+    }
 }

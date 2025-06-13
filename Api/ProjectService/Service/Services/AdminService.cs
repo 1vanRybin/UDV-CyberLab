@@ -140,5 +140,17 @@ namespace Service.Services
 
             return _mapper.Map<List<CommentDto>>(allComments);
         }
+
+        public async Task<List<ShortCardDto>> SearchProjectsByNameAsync(string searchQuery)
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery))
+            {
+                return [];
+            }
+
+            var projects = await _projectRepository.SearchProjectsByNameAsync(searchQuery);
+
+            return _mapper.Map<List<ShortCardDto>>(projects);
+        }
     }
 }

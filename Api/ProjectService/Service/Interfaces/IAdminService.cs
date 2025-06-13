@@ -9,9 +9,10 @@ namespace Service.Interfaces
         Task<ProjectStatisticsDto> GetProjectStatisticsAsync(Guid projectId);
 
         Task<bool> DeleteCommentAsync(Guid commentId);
-
         Task<bool> DeleteProjectAsync(Guid projectId);
 
         Task<List<CommentDto>> GetAllCommentsForModerationAsync();
+
+        Task<List<ShortCardDto>> SearchProjectsByNameAsync(string searchQuery);
     }
 }
