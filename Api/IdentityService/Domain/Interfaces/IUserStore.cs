@@ -14,4 +14,5 @@ public interface IUserStore
     Task<User> GetInfoAsync(Guid userId);
     Task<IdentityResult> DeleteAsync(User user);
     Task<User?> FindByIdAsync(Guid userId);
+    Task<List<User>> SearchByNameAsync(string name);
 }
