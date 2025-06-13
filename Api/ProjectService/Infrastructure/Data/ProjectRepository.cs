@@ -33,15 +33,12 @@ public class ProjectRepository(ProjectsDbContext context) : BaseRepository(conte
 
     public async Task<List<ProjectCard>> SearchProjectsByNameAsync(string searchQuery)
     {
-        var lowerSearchQuery = searchQuery.ToLower();
-
         return await context.Cards
             .Where(p =>
-                EF.Functions.Like(p.Name.ToLower(), $"%{lowerSearchQuery}%") ||
-                (p.ShortDescription != null &&
-                 EF.Functions.Like(p.ShortDescription.ToLower(), $"%{lowerSearchQuery}%")) ||
-                EF.Functions.Like(p.Description.ToLower(), $"%{lowerSearchQuery}%") ||
-                EF.Functions.Like(p.OwnerName.ToLower(), $"%{lowerSearchQuery}%"))
+                EF.Functions.ILike(p.Name, $"%{searchQuery}%") ||
+                EF.Functions.ILike(p.ShortDescription, $"%{searchQuery}%") ||
+                EF.Functions.ILike(p.Description, $"%{searchQuery}%") ||
+                EF.Functions.ILike(p.OwnerName, $"%{searchQuery}%"))
             .OrderByDescending(p => p.Rating)
             .ThenByDescending(p => p.ViewsCount)
             .ToListAsync();
