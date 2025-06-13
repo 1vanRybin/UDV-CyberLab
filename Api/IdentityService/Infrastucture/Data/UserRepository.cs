@@ -9,18 +9,17 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastucture.Data;
 
-public class UserRepository: IUserStore
+public class UserRepository : IUserStore
 {
-    private readonly UserManager<User> _userManager;
+    private const int PageSize = 50; //todo обсудить ограничение с фронтом
     private readonly ApplicationDbContext _dbContext;
-    private const int PageSize = 50;//todo обсудить ограничение с фронтом 
-    
+    private readonly UserManager<User> _userManager;
+
     public UserRepository(UserManager<User> userManager,
         ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
         _userManager = userManager;
-
     }
 
     public async Task<IdentityResult> CreateAsync(User user, string password, string userRole)
@@ -32,22 +31,21 @@ public class UserRepository: IUserStore
         {
             return createResult;
         }
-        
+
         var roleResult = await _userManager.AddToRoleAsync(user, userRole);
         if (!roleResult.Succeeded)
         {
             await transaction.RollbackAsync();
             return roleResult;
         }
-        
+
         await transaction.CommitAsync();
-        
+
         return createResult;
     }
 
     public async Task<JwtSecurityToken?> LoginAsync(User userLogin, string password)
     {
-
         var user = await _userManager.FindByEmailAsync(userLogin.Email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
@@ -69,8 +67,7 @@ public class UserRepository: IUserStore
             return null;
         }
 
-        var roleString = (await _userManager.GetRolesAsync(user)).
-            FirstOrDefault();
+        var roleString = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
         if (roleString != null && roleString != UserRole.USER.ToString() &&
             Enum.TryParse<UserRole>(roleString, out var parsedRole))
@@ -84,7 +81,7 @@ public class UserRepository: IUserStore
     public async Task<List<User>> GetByPageAsync(int page)
     {
         var userQuery = _userManager.Users;
-            
+
         var paginatedUsers = await userQuery
             .Skip((page - 1) * PageSize)
             .Take(PageSize)
@@ -92,7 +89,7 @@ public class UserRepository: IUserStore
 
         return paginatedUsers;
     }
-    
+
     public async Task<User?> CheckExistAsync(Guid id)
     {
         var user = await _userManager.FindByIdAsync(id.ToString());
@@ -101,8 +98,25 @@ public class UserRepository: IUserStore
 
     public List<User> GetAllAsync()
     {
-        var users = _dbContext.Users.ToList();
-        return users;
-    }
+        var usersWithRoles = _dbContext.Users
+            .Select(u => new User
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Role = _dbContext.UserRoles.Where(ur => ur.UserId == u.Id).Join(
+                        _dbContext.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => r.Name
+                    ).Select(roleName =>
+                        roleName == nameof(UserRole.ADMIN) ? UserRole.ADMIN :
+                        roleName == nameof(UserRole.TEACHER) ? UserRole.TEACHER :
+                        UserRole.USER
+                    )
+                    .FirstOrDefault()
+            })
+            .ToList();
 
+        return usersWithRoles;
+    }
 }
