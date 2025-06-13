@@ -50,12 +50,5 @@ namespace Api.Controllers
             var result = await _adminService.DeleteCommentAsync(commentId);
             return Ok(result);
         }
-
-        [HttpGet("projects/search")]
-        public async Task<IActionResult> SearchProjects([FromQuery] string searchQuery)
-        {
-            var projects = await _adminService.SearchProjectsByNameAsync(searchQuery);
-            return Ok(projects);
-        }
     }
 }

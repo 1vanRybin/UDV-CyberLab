@@ -7,5 +7,4 @@ public interface IProjectRepository : IStandartStore
 {
     Task<List<ProjectCard>> GetFilteredProjectsAsync(ProjectFilterDto filter);
     Task<List<ProjectCard>> GetUserProjectsAsync(Guid userId);
-    Task<List<ProjectCard>> SearchProjectsByNameAsync(string searchQuery);
 }

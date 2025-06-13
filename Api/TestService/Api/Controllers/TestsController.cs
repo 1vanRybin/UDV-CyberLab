@@ -24,9 +24,12 @@ public class TestController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Test>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<Test>>> GetTests()
+    public async Task<ActionResult<IEnumerable<Test>>> GetTests(
+        [FromQuery] string? difficulty = null,
+        [FromQuery] string? search = null,
+        [FromQuery] string? subject = null)
     {
-        var tests = await _testService.GetAsync();
+        var tests = await _testService.GetAsync(difficulty, search, subject);
         return Ok(tests);
     }
 
