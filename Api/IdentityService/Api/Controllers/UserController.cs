@@ -1,5 +1,4 @@
-﻿using Domain.Entities;
-using ExampleCore.Helpers;
+﻿using ExampleCore.Helpers;
 using IdentityServerApi.Controllers.User.Request;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -40,9 +39,9 @@ public class UserController : ControllerBase
 
     [HttpGet("users")]
     [Authorize]
-    public ActionResult<ICollection<UserInfoResponse>> GetUsers()
+    public async Task<ActionResult<ICollection<UserInfoResponse>>> GetUsers()
     {
-        var users = _userService.GetUsersAsync();
+        var users = await _userService.GetUsersAsync();
         return users.Select(user => new UserInfoResponse
         {
             UserId = user.Id,

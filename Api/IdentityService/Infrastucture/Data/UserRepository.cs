@@ -1,27 +1,25 @@
-﻿using System.Data.Entity;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using Core.BasicRoles;
 using Core.Helpers;
-using CRM.Data.Common.Exceptions;
 using Domain.Entities;
 using Domain.Interfaces;
 using Medo;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastucture.Data;
 
-public class UserRepository: IUserStore
+public class UserRepository : IUserStore
 {
-    private readonly UserManager<User> _userManager;
+    private const int PageSize = 50; //todo обсудить ограничение с фронтом
     private readonly ApplicationDbContext _dbContext;
-    private const int PageSize = 50;//todo обсудить ограничение с фронтом
+    private readonly UserManager<User> _userManager;
 
     public UserRepository(UserManager<User> userManager,
         ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
         _userManager = userManager;
-
     }
 
     public async Task<IdentityResult> CreateAsync(User user, string password, string userRole)
@@ -48,7 +46,6 @@ public class UserRepository: IUserStore
 
     public async Task<JwtSecurityToken?> LoginAsync(User userLogin, string password)
     {
-
         var user = await _userManager.FindByEmailAsync(userLogin.Email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
@@ -70,8 +67,7 @@ public class UserRepository: IUserStore
             return null;
         }
 
-        var roleString = (await _userManager.GetRolesAsync(user)).
-            FirstOrDefault();
+        var roleString = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
 
         if (roleString != null && roleString != UserRole.USER.ToString() &&
             Enum.TryParse<UserRole>(roleString, out var parsedRole))
@@ -91,7 +87,7 @@ public class UserRepository: IUserStore
 
     public async Task<User?> FindByIdAsync(Guid userId)
     {
-        var result =  await _userManager.FindByIdAsync(userId.ToString());
+        var result = await _userManager.FindByIdAsync(userId.ToString());
 
         return result;
     }
@@ -114,10 +110,28 @@ public class UserRepository: IUserStore
         return user;
     }
 
-    public List<User> GetAllAsync()
+    public async Task<List<User>> GetAllAsync()
     {
-        var users = _dbContext.Users.ToList();
-        return users;
-    }
+        var usersWithRoles = await _dbContext.Users
+            .Select(u => new User
+            {
+                Id = u.Id,
+                UserName = u.UserName,
+                Email = u.Email,
+                Role = _dbContext.UserRoles.Where(ur => ur.UserId == u.Id).Join(
+                        _dbContext.Roles,
+                        ur => ur.RoleId,
+                        r => r.Id,
+                        (ur, r) => r.Name
+                    ).Select(roleName =>
+                        roleName == nameof(UserRole.ADMIN) ? UserRole.ADMIN :
+                        roleName == nameof(UserRole.TEACHER) ? UserRole.TEACHER :
+                        UserRole.USER
+                    )
+                    .FirstOrDefault()
+            })
+            .ToListAsync();
 
+        return usersWithRoles;
+    }
 }
