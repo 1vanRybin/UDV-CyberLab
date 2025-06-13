@@ -19,11 +19,13 @@ public class ProjectCardController(IProjectService _projectService) : Controller
     }
 
     [HttpGet("allShort")]
-    public async Task<IActionResult> GetAllShortProjectCards([FromQuery] SortOrder sortOrder = SortOrder.Default)
+    public async Task<IActionResult> GetAllShortProjectCards([FromQuery] SortOrder sortOrder = SortOrder.Default,
+        [FromQuery] string? searchQuery = null)
     {
         var filter = new ProjectFilterDto
         {
-            SortOrder = sortOrder
+            SortOrder = sortOrder,
+            Name = searchQuery
         };
 
         var filteredProjects = await _projectService.GetFilteredProjectsAsync(filter);
@@ -38,6 +40,7 @@ public class ProjectCardController(IProjectService _projectService) : Controller
         var cards = await _projectService.GetUserProjects(currentUserId);
         return Ok(cards);
     }
+
     [HttpPost]
     public async Task<IActionResult> CreateProjectCard([FromForm] ProjectCardDTO request)
     {

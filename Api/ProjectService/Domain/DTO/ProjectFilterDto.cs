@@ -3,6 +3,7 @@ namespace Domain.DTO
     public class ProjectFilterDto
     {
         public SortOrder SortOrder { get; set; } = SortOrder.Default;
+        public string? Name { get; set; } = null;
     }
 
     public enum SortOrder

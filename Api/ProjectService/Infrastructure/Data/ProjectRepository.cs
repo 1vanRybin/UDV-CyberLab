@@ -12,6 +12,10 @@ public class ProjectRepository(ProjectsDbContext context) : BaseRepository(conte
     {
         IQueryable<ProjectCard> query = context.Cards;
 
+        if (!string.IsNullOrEmpty(filter.Name))
+            query = query.Where(p =>
+                EF.Functions.ILike(p.Name, $"%{filter.Name}%"));
+
         query = filter.SortOrder switch
         {
             SortOrder.ByRating => query.OrderByDescending(p => p.Rating),
@@ -29,15 +33,5 @@ public class ProjectRepository(ProjectsDbContext context) : BaseRepository(conte
         var query = context.Cards.Where(c => c.OwnerId == userId);
 
         return await query.ToListAsync();
-    }
-
-    public async Task<List<ProjectCard>> SearchProjectsByNameAsync(string searchQuery)
-    {
-        return await context.Cards
-            .Where(p =>
-                EF.Functions.ILike(p.Name, $"%{searchQuery}%"))
-            .OrderByDescending(p => p.Rating)
-            .ThenByDescending(p => p.ViewsCount)
-            .ToListAsync();
     }
 }
