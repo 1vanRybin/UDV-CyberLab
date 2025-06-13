@@ -9,17 +9,18 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Infrastucture.Data;
 
-public class UserRepository : IUserStore
+public class UserRepository: IUserStore
 {
-    private const int PageSize = 50; //todo обсудить ограничение с фронтом
-    private readonly ApplicationDbContext _dbContext;
     private readonly UserManager<User> _userManager;
+    private readonly ApplicationDbContext _dbContext;
+    private const int PageSize = 50;//todo обсудить ограничение с фронтом
 
     public UserRepository(UserManager<User> userManager,
         ApplicationDbContext dbContext)
     {
         _dbContext = dbContext;
         _userManager = userManager;
+
     }
 
     public async Task<IdentityResult> CreateAsync(User user, string password, string userRole)
@@ -46,6 +47,7 @@ public class UserRepository : IUserStore
 
     public async Task<JwtSecurityToken?> LoginAsync(User userLogin, string password)
     {
+
         var user = await _userManager.FindByEmailAsync(userLogin.Email);
         if (user == null || !await _userManager.CheckPasswordAsync(user, password))
         {
@@ -67,7 +69,8 @@ public class UserRepository : IUserStore
             return null;
         }
 
-        var roleString = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+        var roleString = (await _userManager.GetRolesAsync(user)).
+            FirstOrDefault();
 
         if (roleString != null && roleString != UserRole.USER.ToString() &&
             Enum.TryParse<UserRole>(roleString, out var parsedRole))
@@ -76,6 +79,20 @@ public class UserRepository : IUserStore
         }
 
         return user;
+    }
+
+    public async Task<IdentityResult> DeleteAsync(User user)
+    {
+        var result = await _userManager.DeleteAsync(user);
+
+        return result;
+    }
+
+    public async Task<User?> FindByIdAsync(Guid userId)
+    {
+        var result =  await _userManager.FindByIdAsync(userId.ToString());
+
+        return result;
     }
 
     public async Task<List<User>> GetByPageAsync(int page)

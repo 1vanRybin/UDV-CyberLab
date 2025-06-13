@@ -11,6 +11,7 @@ public static class ServiceStartUp
         serviceCollection.AddScoped<IUserService, UserService>();
         serviceCollection.AddScoped<UserManager<User>>();
         serviceCollection.AddScoped<RoleManager<IdentityRole<Guid>>>();
+        serviceCollection.AddScoped<IAdminService, AdminService>();
 
         return serviceCollection;
     }
