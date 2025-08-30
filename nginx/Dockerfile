@@ -1,0 +1,15 @@
+FROM nginx:alpine
+
+# Копируем конфигурацию
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Создаем директорию для SSL сертификатов
+RUN mkdir -p /etc/letsencrypt/live/neolab-backend.aydlioh.ru
+
+# Открываем порты
+EXPOSE 80 443
+
+# Проверяем конфигурацию nginx
+RUN nginx -t
+
+CMD ["nginx", "-g", "daemon off;"]
